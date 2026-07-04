@@ -13,20 +13,20 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
 
-        // ඇප් එක ඔන් වෙද්දීම මුලින්ම HomeFragment එක ලෝඩ් කරනවා
+        // ඇප් එක ඔන් වෙද්දීම මුලින්ම ChatFragment එක ලෝඩ් කරනවා
         if (savedInstanceState == null) {
-            loadFragment(HomeFragment())
+            loadFragment(ChatFragment())
         }
 
         // ටැබ් ක්ලික් කරද්දී වෙනස් වෙන්න ඕන ලොජික් එක
         bottomNavigation.setOnItemSelectedListener { item ->
             var selectedFragment: Fragment? = null
             when (item.itemId) {
-                R.id.nav_home -> selectedFragment = HomeFragment()
-                R.id.nav_journey -> selectedFragment = HomeFragment() // දැනට Home එකම දමු, පස්සේ Fragments හදලා මාරු කරමු
-                R.id.nav_activities -> selectedFragment = HomeFragment()
-                R.id.nav_community -> selectedFragment = HomeFragment()
-                R.id.nav_profile -> selectedFragment = HomeFragment()
+                R.id.nav_chat -> selectedFragment = ChatFragment()
+                R.id.nav_journey -> selectedFragment = ChatFragment() // දැනට Chat එකම දමු, පස්සේ Fragments හදලා මාරු කරමු
+                R.id.nav_activities -> selectedFragment = ChatFragment()
+                R.id.nav_community -> selectedFragment = ChatFragment()
+                R.id.nav_profile -> selectedFragment = ChatFragment()
             }
             if (selectedFragment != null) {
                 loadFragment(selectedFragment)

@@ -5,4 +5,6 @@
 
     <color name="teal_gradient_start">#4DB6AC</color>
     <color name="teal_gradient_end">#004D40</color>
-    <color name="teal_text_muted">#B2DFDB</color>     </resources>
+    <color name="teal_text_muted">#B2DFDB</color>
+    <color name="background_color">#E0F2F1</color>
+</resources>

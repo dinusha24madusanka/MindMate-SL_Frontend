@@ -1,5 +1,7 @@
 package com.dinusha.mindmate_sl
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 
 class ChatFragment : Fragment() {
 
@@ -18,6 +21,8 @@ class ChatFragment : Fragment() {
     private val messageList = ArrayList<ChatMessage>()
     private lateinit var rvChatMessages: RecyclerView
     private lateinit var ivCenterGizmo: ImageView
+    private lateinit var lottieRobotAvatar: LottieAnimationView
+    private lateinit var avatarBackgroundContainer: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,5 +69,65 @@ class ChatFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        lottieRobotAvatar = view.findViewById(R.id.lottieAvatar)
+        avatarBackgroundContainer = view.findViewById(R.id.avatarBackgroundContainer)
+        loadSelectedAvatar()
+        updateStressLevelBackground(50)
+    }
+    private fun loadSelectedAvatar() {
+        val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
+
+        // දත්ත නිවැරදිව ලැබේදැයි බැලීමට Default එකක් ලෙස "ERROR" යොදා ඇත
+        val selectedAvatarId = sharedPreferences.getString("SELECTED_AVATAR_ID", "ERROR")
+
+        // Logcat එකේ දත්ත පරීක්ෂා කිරීම සඳහා (මෙය අතිශය වැදගත් වේ)
+        android.util.Log.d("MindMateDebug", "Retrieved Avatar ID: $selectedAvatarId")
+
+        val animationFile: String
+        val avatarName: String
+
+        when (selectedAvatarId) {
+            "bot_gizmo" -> {
+                animationFile = "Gizmo Robot.json"
+                avatarName = "Gizmo"
+            }
+            "bot_astro" -> {
+                animationFile = "Astro Robot.json"
+                avatarName = "Astro"
+            }
+            "bot_neo" -> {
+                animationFile = "Neo Robot.json"
+                avatarName = "Neo"
+            }
+            else -> {
+                // දත්ත නිසි පරිදි Save වී නොමැති නම් Gizmo පෙන්වයි
+                animationFile = "Gizmo Robot.json"
+                avatarName = "Gizmo"
+                android.util.Log.e("MindMateDebug", "Avatar ID mismatch or not saved!")
+            }
+        }
+
+        // 1. ප්‍රධාන රොබෝ Animation එක වෙනස් කිරීම
+        lottieRobotAvatar.setAnimation(animationFile)
+        lottieRobotAvatar.playAnimation()
+
+        // 2. Top Bar එකේ නම වෙනස් කිරීම
+        // (ඔබගේ XML හි අදාළ TextView එකේ ID එක "tvTopBarAvatarName" යැයි උපකල්පනය කර ඇත. එය ඔබේ ID එකට වෙනස් කරන්න)
+        val tvTopBarName = requireView().findViewById<android.widget.TextView>(R.id.tvTopBarAvatarName)
+        tvTopBarName.text = avatarName
+    }
+
+    private fun updateStressLevelBackground(stressLevel: Int) {
+        val backgroundColor = when (stressLevel) {
+            in 0..30 -> Color.parseColor("#E0F2F1") // Light Green
+            in 31..70 -> Color.parseColor("#FFF9C4") // Light Yellow
+            in 71..100 -> Color.parseColor("#FFCDD2") // Light Red
+            else -> Color.parseColor("#F5F5F5") // Default/Gray
+        }
+        avatarBackgroundContainer.setBackgroundColor(backgroundColor)
     }
 }
