@@ -26,11 +26,11 @@ class ChooseRobotActivity : AppCompatActivity() {
         btnConfirmSelection = findViewById(R.id.btnConfirmSelection)
 
         // 1. Gizmo, Astro, Neo අවතාර් 3 එකතු කිරීම
-        // අනිවාර්යයෙන්ම "Gizmo Robot.json", "Astro Robot.json", "Neo Robot.json" ගොනු assets ෆෝල්ඩරයේ තිබිය යුතුය.
+        // අනිවාර්යයෙන්ම "gizmo_robot.json", "astro_robot.json", "neo_robot.json" ගොනු assets ෆෝල්ඩරයේ තිබිය යුතුය.
         avatarList = listOf(
-            Avatar("bot_gizmo", "Gizmo", "Gizmo Robot.json"),
-            Avatar("bot_astro", "Astro", "Astro Robot.json"),
-            Avatar("bot_neo", "Neo", "Neo Robot.json")
+            Avatar("bot_gizmo", "Gizmo", "gizmo_robot.json"),
+            Avatar("bot_astro", "Astro", "astro_robot.json"),
+            Avatar("bot_neo", "Neo", "neo_robot.json")
         )
 
         val adapter = AvatarAdapter(avatarList)
