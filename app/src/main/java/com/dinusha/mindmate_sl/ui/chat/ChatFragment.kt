@@ -61,12 +61,13 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             if (messageText.isNotEmpty()) {
                 // පරිශීලකයාගේ පණිවිඩය එකතු කිරීම
                 messageList.add(ChatMessage(messageText, isUser = true))
-                chatAdapter.notifyDataSetChanged()
+
+                // Optimized update: notifyDataSetChanged() වෙනුවට නිවැරදි ක්‍රමය
+                chatAdapter.notifyItemInserted(messageList.size - 1)
                 rvChatMessages.scrollToPosition(messageList.size - 1)
                 etMessageInput.text.clear()
 
                 // මකා දැමූ Mock Reply තර්කනය නැවත ස්ථාපනය කිරීම (Handler එකක් මගින් ආරක්ෂිතව)
-                // සැබෑ ජාල සම්බන්ධතාවයක් හැඟවීම සඳහා මිලි තත්පර 1000 ක (තත්පර 1) ප්‍රමාදයක් ලබා දී ඇත
                 Handler(Looper.getMainLooper()).postDelayed({
 
                     // හැම Mood එකක්ම (Happy, Neutral, Sad) මාරුවෙන් මාරුවට පරීක්ෂා කිරීමට 0-100 අතර සසම්භාවී Stress අගයක් ගැනීම
@@ -80,8 +81,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             }
         }
 
-        // Default ආරම්භක තත්ත්වය
-        updateAvatarAndMood(50)
+        // Default ආරම්භක තත්ත්වය (පරණ ස්කෝර් එකක් නැත්නම් මැද අගය 50 ගනී)
+        val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
+        val lastSavedScore = sharedPreferences.getInt("LAST_STRESS_SCORE", 50)
+        updateAvatarAndMood(lastSavedScore)
     }
 
     /**
@@ -108,7 +111,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     }
 
     /**
-     * රොබෝවාගේ Animation සහ මැද කොටුවේ Background වර්ණය යාවත්කාලීන කිරීම (කිසිදු වෙනසක් කර නැත)
+     * රොබෝවාගේ Animation සහ මැද කොටුවේ Background වර්ණය යාවත්කාලීන කිරීම
      */
     fun updateAvatarAndMood(stressLevel: Int) {
         val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
@@ -139,12 +142,19 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     }
 
     /**
-     * රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම
+     * රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම සහ අගය සේව් කිරීම
      */
     fun receiveBotResponse(reply: String, stressScore: Int) {
+        // 1. ලැබුණු Stress Score එක SharedPreferences එකට සේව් කිරීම (ActivitiesFragment එකට කියවීමට)
+        val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putInt("LAST_STRESS_SCORE", stressScore).apply()
+
+        // 2. රොබෝගේ පෙනුම වෙනස් කිරීම
         updateAvatarAndMood(stressScore)
+
+        // 3. ලිස්ට් එකට දත්ත එකතු කර සිනිදුවට UI එක Update කිරීම
         messageList.add(ChatMessage(reply, isUser = false))
-        chatAdapter.notifyDataSetChanged()
+        chatAdapter.notifyItemInserted(messageList.size - 1)
         rvChatMessages.scrollToPosition(messageList.size - 1)
     }
 }
