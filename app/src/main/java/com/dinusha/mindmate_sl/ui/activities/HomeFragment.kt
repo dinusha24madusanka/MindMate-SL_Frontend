@@ -1,10 +1,12 @@
-package com.dinusha.mindmate_sl
+package com.dinusha.mindmate_sl.ui.activities
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.dinusha.mindmate_sl.R
+import com.dinusha.mindmate_sl.ui.chat.ChatFragment
 import com.google.android.material.button.MaterialButton
 
 class HomeFragment : Fragment() {

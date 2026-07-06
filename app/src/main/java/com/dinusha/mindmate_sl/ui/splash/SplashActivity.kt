@@ -1,4 +1,4 @@
-package com.dinusha.mindmate_sl.UI.splash
+package com.dinusha.mindmate_sl.ui.splash
 
 import android.content.Context
 import android.content.Intent
@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.dinusha.mindmate_sl.MainActivity
+import com.dinusha.mindmate_sl.ui.main.MainActivity
 import com.dinusha.mindmate_sl.R
-import com.dinusha.mindmate_sl.UI.avatar.ChooseRobotActivity
+import com.dinusha.mindmate_sl.ui.avatar.ChooseRobotActivity
 
 class SplashActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.dinusha.mindmate_sl.UI.avatar
+package com.dinusha.mindmate_sl.ui.avatar
 
 import android.view.LayoutInflater
 import android.view.View

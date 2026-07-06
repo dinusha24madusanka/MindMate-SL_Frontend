@@ -1,4 +1,4 @@
-package com.dinusha.mindmate_sl.UI.avatar
+package com.dinusha.mindmate_sl.ui.avatar
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.dinusha.mindmate_sl.R
-import com.dinusha.mindmate_sl.MainActivity // ඔයාගේ Main Activity එක
+import com.dinusha.mindmate_sl.ui.main.MainActivity // ඔයාගේ Main Activity එක
 
 class ChooseRobotActivity : AppCompatActivity() {
 

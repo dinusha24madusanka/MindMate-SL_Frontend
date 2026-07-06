@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MindMateSL">
         <activity
-            android:name=".UI.splash.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,11 +21,11 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false">
         </activity>
         <activity
-            android:name=".UI.avatar.ChooseRobotActivity">
+            android:name=".ui.avatar.ChooseRobotActivity">
         </activity>
     </application>
 

@@ -1,4 +1,4 @@
-package com.dinusha.mindmate_sl.UI.avatar
+package com.dinusha.mindmate_sl.ui.avatar
 
 data class Avatar(
     val id: String,

@@ -1,10 +1,14 @@
-package com.dinusha.mindmate_sl
+package com.dinusha.mindmate_sl.ui.chat
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.dinusha.mindmate_sl.data.model.ChatMessage
+import com.dinusha.mindmate_sl.R
 
 class ChatAdapter(private val messageList: List<ChatMessage>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -50,8 +54,25 @@ class ChatAdapter(private val messageList: List<ChatMessage>) :
     // Bot ගේ මැසේජ් එක ViewHolder එකට බඳින එක (Binding)
     class BotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvBotMessage: TextView = itemView.findViewById(R.id.tvBotMessage)
+        private val ivBotAvatar: ImageView = itemView.findViewById(R.id.ivBotAvatar)
+
         fun bind(chatMessage: ChatMessage) {
             tvBotMessage.text = chatMessage.text
+
+            // 1. Context එක හරහා SharedPreferences ලබා ගැනීම
+            val context = itemView.context
+            val sharedPreferences = context.getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
+            val selectedAvatarId = sharedPreferences.getString("SELECTED_AVATAR_ID", "bot_gizmo") ?: "bot_gizmo"
+
+            // 2. තෝරාගත් රොබෝවා අනුව නිවැරදි කුඩා Icon එක තෝරා ගැනීම
+            val botIconRes = when (selectedAvatarId) {
+                "bot_astro" -> R.drawable.ic_astro_icon
+                "bot_neo" -> R.drawable.ic_neo_icon
+                else -> R.drawable.ic_gizmo_icon
+            }
+
+            // 3. ViewHolder එක ඇතුලේ තියෙන රොබෝගේ ImageView එකට පින්තූරය සෙට් කිරීම
+            ivBotAvatar.setImageResource(botIconRes)
         }
     }
 }
