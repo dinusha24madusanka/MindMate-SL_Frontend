@@ -3,8 +3,6 @@ package com.dinusha.mindmate_sl.ui.chat
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -16,7 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.dinusha.mindmate_sl.data.model.ChatMessage
 import com.dinusha.mindmate_sl.R
-import kotlin.random.Random
+import com.dinusha.mindmate_sl.model.ChatRequest
+import com.dinusha.mindmate_sl.model.ChatResponse
+import com.dinusha.mindmate_sl.network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
@@ -67,17 +70,24 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 rvChatMessages.scrollToPosition(messageList.size - 1)
                 etMessageInput.text.clear()
 
-                // මකා දැමූ Mock Reply තර්කනය නැවත ස්ථාපනය කිරීම (Handler එකක් මගින් ආරක්ෂිතව)
-                Handler(Looper.getMainLooper()).postDelayed({
+                // API Request එක යැවීම
+                val request = ChatRequest(messageText)
+                RetrofitClient.getApiService().sendChatMessage(request).enqueue(object : Callback<ChatResponse> {
+                    override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
+                        if (response.isSuccessful && response.body() != null) {
+                            val aiReply = response.body()!!.reply
+                            val stressScore = response.body()!!.stressScore
+                            // රොබෝගේ පිළිතුර UI එකට යැවීම
+                            receiveBotResponse(aiReply, stressScore)
+                        } else {
+                            receiveBotResponse("Error: සේවාදායකය සමඟ සම්බන්ධ වීමට නොහැක.", 50)
+                        }
+                    }
 
-                    // හැම Mood එකක්ම (Happy, Neutral, Sad) මාරුවෙන් මාරුවට පරීක්ෂා කිරීමට 0-100 අතර සසම්භාවී Stress අගයක් ගැනීම
-                    val simulatedStressScore = Random.nextInt(0, 101)
-                    val botReplyText = "ඔයා කිව්වේ \"$messageText\" කියලා"
-
-                    // රොබෝගේ පිළිතුර UI එකට යැවීම
-                    receiveBotResponse(botReplyText, simulatedStressScore)
-
-                }, 1000)
+                    override fun onFailure(call: Call<ChatResponse>, t: Throwable) {
+                        receiveBotResponse("Error: ${t.message}", 50)
+                    }
+                })
             }
         }
 
