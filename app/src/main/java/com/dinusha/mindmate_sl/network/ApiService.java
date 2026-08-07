@@ -8,6 +8,6 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface ApiService {
-    @POST("api/chat")
+    @POST("api/v1/chat/analyze")
     Call<ChatResponse> sendChatMessage(@Body ChatRequest request);
 }

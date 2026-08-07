@@ -3,8 +3,9 @@ package com.dinusha.mindmate_sl.ui.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.dinusha.mindmate_sl.ui.chat.ChatFragment
 import com.dinusha.mindmate_sl.R
+import com.dinusha.mindmate_sl.ui.chat.ChatFragment
+import com.dinusha.mindmate_sl.ui.journey.JourneyFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_chat -> selectedFragment = ChatFragment()
                 R.id.nav_journey -> selectedFragment =
-                    ChatFragment() // දැනට Chat එකම දමු, පස්සේ Fragments හදලා මාරු කරමු
+                    JourneyFragment() // දැනට Chat එකම දමු, පස්සේ Fragments හදලා මාරු කරමු
                 R.id.nav_activities -> selectedFragment = ChatFragment()
                 R.id.nav_community -> selectedFragment = ChatFragment()
                 R.id.nav_profile -> selectedFragment = ChatFragment()
