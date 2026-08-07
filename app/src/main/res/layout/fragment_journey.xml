@@ -201,12 +201,68 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Based on your AI-analyzed chat stress scores"
+                    android:textColor="#78909C"
+                    android:textSize="13sp" />
+
+                <!-- Average -->
+                <TextView
+                    android:id="@+id/weeklyAverageText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="Weekly Average: --"
+                    android:textColor="#263238"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- Highest Stress -->
+                <TextView
+                    android:id="@+id/highestStressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Highest Stress: --"
+                    android:textColor="#263238"
+                    android:textSize="15sp" />
+
+                <!-- Trend -->
+                <TextView
+                    android:id="@+id/stressTrendText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Trend: --"
+                    android:textColor="#263238"
+                    android:textSize="15sp" />
+
+                <!-- Data coverage -->
+                <TextView
+                    android:id="@+id/dataCoverageText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Data: --"
+                    android:textColor="#78909C"
+                    android:textSize="13sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#E0E8E6" />
+
+                <!-- Dynamic Insight -->
+                <TextView
                     android:id="@+id/aiInsightText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="14dp"
                     android:lineSpacingExtra="4dp"
-                    android:text="Complete your daily check-in to start receiving wellbeing insights."
+                    android:text="More chat data is needed to generate your weekly insight."
                     android:textColor="#455A64"
                     android:textSize="15sp" />
 

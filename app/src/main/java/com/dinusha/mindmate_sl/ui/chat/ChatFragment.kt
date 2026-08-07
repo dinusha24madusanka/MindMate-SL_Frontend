@@ -75,12 +75,22 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 RetrofitClient.getApiService().sendChatMessage(request).enqueue(object : Callback<ChatResponse> {
                     override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                         if (response.isSuccessful && response.body() != null) {
+
                             val aiReply = response.body()!!.reply
                             val stressScore = response.body()!!.stressScore
-                            // රොබෝගේ පිළිතුර UI එකට යැවීම
+
+                            // AI stress score එක Journey එකට save කරනවා
+                            saveStressScoreToJourney(stressScore)
+
+                            // Chat UI එකට reply එක දානවා
                             receiveBotResponse(aiReply, stressScore)
+
                         } else {
-                            receiveBotResponse("Error: සේවාදායකය සමඟ සම්බන්ධ වීමට නොහැක.", 50)
+
+                            receiveBotResponse(
+                                "Error: සේවාදායකය සමඟ සම්බන්ධ වීමට නොහැක.",
+                                50
+                            )
                         }
                     }
 
@@ -166,5 +176,51 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         messageList.add(ChatMessage(reply, isUser = false))
         chatAdapter.notifyItemInserted(messageList.size - 1)
         rvChatMessages.scrollToPosition(messageList.size - 1)
+    }
+
+    private fun saveStressScoreToJourney(stressScore: Int) {
+
+        val preferences = requireContext().getSharedPreferences(
+            "mindmate_journey",
+            android.content.Context.MODE_PRIVATE
+        )
+
+        val dateKey = java.text.SimpleDateFormat(
+            "yyyy-MM-dd",
+            java.util.Locale.getDefault()
+        ).format(java.util.Date())
+
+        // අද දවසේ කලින් save කරපු AI scores
+        val currentSum = preferences.getInt(
+            "${dateKey}_ai_stress_sum",
+            0
+        )
+
+        val currentCount = preferences.getInt(
+            "${dateKey}_ai_stress_count",
+            0
+        )
+
+        // අලුත් score එක එකතු කරනවා
+        val newSum = currentSum + stressScore
+        val newCount = currentCount + 1
+
+        // අද දවසේ average stress score
+        val averageStress = newSum / newCount
+
+        preferences.edit()
+            .putInt(
+                "${dateKey}_ai_stress_sum",
+                newSum
+            )
+            .putInt(
+                "${dateKey}_ai_stress_count",
+                newCount
+            )
+            .putInt(
+                "${dateKey}_stress",
+                averageStress
+            )
+            .apply()
     }
 }

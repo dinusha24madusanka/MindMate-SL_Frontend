@@ -30,6 +30,11 @@ class JourneyFragment : Fragment() {
 
     private lateinit var moodHistoryContainer: LinearLayout
     private lateinit var weeklyStressView: WeeklyStressView
+    private lateinit var averageStressText: TextView
+    private lateinit var weeklyAverageText: TextView
+    private lateinit var highestStressText: TextView
+    private lateinit var stressTrendText: TextView
+    private lateinit var dataCoverageText: TextView
     private lateinit var aiInsightText: TextView
 
     private var selectedMood: String? = null
@@ -91,6 +96,18 @@ class JourneyFragment : Fragment() {
 
         weeklyStressView =
             view.findViewById(R.id.weeklyStressView)
+
+        weeklyAverageText =
+            view.findViewById(R.id.weeklyAverageText)
+
+        highestStressText =
+            view.findViewById(R.id.highestStressText)
+
+        stressTrendText =
+            view.findViewById(R.id.stressTrendText)
+
+        dataCoverageText =
+            view.findViewById(R.id.dataCoverageText)
 
         aiInsightText =
             view.findViewById(R.id.aiInsightText)
@@ -219,7 +236,7 @@ class JourneyFragment : Fragment() {
                 selectedEmoji
             )
             .putInt(
-                "${dateKey}_stress",
+                "${dateKey}_mood_stress",
                 selectedStressScore
             )
             .apply()
@@ -266,17 +283,29 @@ class JourneyFragment : Fragment() {
                     Locale.getDefault()
                 ).format(calendar.time)
 
-            if (
-                preferences.contains(
-                    "${dateKey}_stress"
-                )
-            ) {
+            when {
 
-                values[i] =
-                    preferences.getInt(
+                // Priority 1 - Real AI stress score
+                preferences.contains("${dateKey}_stress") -> {
+
+                    values[i] = preferences.getInt(
                         "${dateKey}_stress",
                         0
                     ).toFloat()
+                }
+
+                // Priority 2 - Mood based estimate
+                preferences.contains("${dateKey}_mood_stress") -> {
+
+                    values[i] = preferences.getInt(
+                        "${dateKey}_mood_stress",
+                        0
+                    ).toFloat()
+                }
+
+                else -> {
+                    values[i] = null
+                }
             }
 
             calendar.add(
@@ -455,83 +484,237 @@ class JourneyFragment : Fragment() {
 
     private fun generateInsight() {
 
-        val calendar =
-            Calendar.getInstance()
+        val calendar = Calendar.getInstance()
 
-        var total = 0
-        var count = 0
+        // Current week එක Monday එකෙන් start කරනවා
+        calendar.set(
+            Calendar.DAY_OF_WEEK,
+            Calendar.MONDAY
+        )
+
+        val scores = mutableListOf<Pair<Int, Int>>()
+
         var highestStress = -1
         var highestStressDay = ""
 
-        for (i in 0 until 7) {
+        var totalStress = 0
 
-            val dateKey =
-                SimpleDateFormat(
-                    "yyyy-MM-dd",
-                    Locale.getDefault()
-                ).format(calendar.time)
+        for (dayIndex in 0 until 7) {
 
-            if (
-                preferences.contains(
-                    "${dateKey}_stress"
+            val dateKey = SimpleDateFormat(
+                "yyyy-MM-dd",
+                Locale.getDefault()
+            ).format(calendar.time)
+
+            if (preferences.contains("${dateKey}_stress")) {
+
+                val stressScore = preferences.getInt(
+                    "${dateKey}_stress",
+                    0
                 )
-            ) {
 
-                val stress =
-                    preferences.getInt(
-                        "${dateKey}_stress",
-                        0
-                    )
+                scores.add(
+                    Pair(dayIndex, stressScore)
+                )
 
-                total += stress
-                count++
+                totalStress += stressScore
 
-                if (stress > highestStress) {
+                if (stressScore > highestStress) {
 
-                    highestStress = stress
+                    highestStress = stressScore
 
-                    highestStressDay =
-                        SimpleDateFormat(
-                            "EEEE",
-                            Locale.getDefault()
-                        ).format(calendar.time)
+                    highestStressDay = SimpleDateFormat(
+                        "EEEE",
+                        Locale.getDefault()
+                    ).format(calendar.time)
                 }
             }
 
             calendar.add(
                 Calendar.DAY_OF_MONTH,
-                -1
+                1
             )
         }
 
-        if (count == 0) {
+        // No AI data
+        if (scores.isEmpty()) {
+
+            weeklyAverageText.text =
+                "Weekly Average: --"
+
+            highestStressText.text =
+                "Highest Stress: --"
+
+            stressTrendText.text =
+                "Trend: Not enough data"
+
+            dataCoverageText.text =
+                "Data: 0 of 7 days"
 
             aiInsightText.text =
-                "Complete your daily check-in to start receiving wellbeing insights."
+                "Chat with MindMate during the week to build your stress trend and receive personalized insights."
 
             return
         }
 
-        val average =
-            total / count
+        // -------------------------------
+        // Average stress
+        // -------------------------------
 
-        aiInsightText.text =
+        val averageStress =
+            totalStress.toDouble() / scores.size
+
+        weeklyAverageText.text =
+            "Weekly Average: ${averageStress.toInt()}/100"
+
+        highestStressText.text =
+            "Highest Stress: $highestStress/100 on $highestStressDay"
+
+        dataCoverageText.text =
+            "Data: ${scores.size} of 7 days"
+
+        // -------------------------------
+        // Trend calculation
+        // -------------------------------
+
+        val trendSlope =
+            calculateTrendSlope(scores)
+
+        val trendText =
             when {
 
-                average >= 70 ->
-                    "Your recent check-ins suggest a higher stress pattern. " +
-                            "Your highest recorded stress was on $highestStressDay. " +
-                            "Consider taking a short break, doing a breathing exercise, " +
-                            "or using the MindMate chat for support."
+                scores.size < 2 ->
+                    "Not enough data"
 
-                average >= 45 ->
-                    "Your mood has been mixed recently. " +
-                            "Stress was highest on $highestStressDay. " +
-                            "Regular check-ins can help you identify what affects your wellbeing."
+                trendSlope <= -3 ->
+                    "Improving ↓"
+
+                trendSlope >= 3 ->
+                    "Increasing ↑"
 
                 else ->
-                    "Your recent mood trend looks relatively positive. " +
-                            "Keep maintaining the habits that are helping you feel well."
+                    "Stable →"
             }
+
+        stressTrendText.text =
+            "Trend: $trendText"
+
+        // -------------------------------
+        // Dynamic insight
+        // -------------------------------
+
+        aiInsightText.text =
+            buildDynamicInsight(
+                averageStress = averageStress,
+                highestStress = highestStress,
+                highestStressDay = highestStressDay,
+                trendSlope = trendSlope,
+                dataCount = scores.size
+            )
+    }
+    private fun calculateTrendSlope(
+        scores: List<Pair<Int, Int>>
+    ): Double {
+
+        if (scores.size < 2) {
+            return 0.0
+        }
+
+        val meanX =
+            scores.map { it.first }
+                .average()
+
+        val meanY =
+            scores.map { it.second }
+                .average()
+
+        var numerator = 0.0
+        var denominator = 0.0
+
+        for ((day, score) in scores) {
+
+            val xDifference =
+                day - meanX
+
+            val yDifference =
+                score - meanY
+
+            numerator +=
+                xDifference * yDifference
+
+            denominator +=
+                xDifference * xDifference
+        }
+
+        if (denominator == 0.0) {
+            return 0.0
+        }
+
+        return numerator / denominator
+    }
+    private fun buildDynamicInsight(
+        averageStress: Double,
+        highestStress: Int,
+        highestStressDay: String,
+        trendSlope: Double,
+        dataCount: Int
+    ): String {
+
+        if (dataCount == 1) {
+
+            return "Only one day of AI stress data is available this week. " +
+                    "Your recorded stress score was ${averageStress.toInt()}/100. " +
+                    "Continue chatting with MindMate during the week so a reliable trend can be identified."
+        }
+
+        val averageMessage =
+            when {
+
+                averageStress >= 75 ->
+                    "Your weekly average indicates a high stress pattern."
+
+                averageStress >= 50 ->
+                    "Your weekly average indicates a moderate stress pattern."
+
+                averageStress >= 30 ->
+                    "Your weekly stress level has generally remained manageable."
+
+                else ->
+                    "Your weekly stress scores have generally remained low."
+            }
+
+        val trendMessage =
+            when {
+
+                trendSlope <= -3 ->
+                    "Your stress scores are decreasing across the week, which suggests an improving trend."
+
+                trendSlope >= 3 ->
+                    "Your stress scores are increasing across the week, so it may be useful to pay attention to recent stressors."
+
+                else ->
+                    "Your stress scores have remained relatively stable across the available days."
+            }
+
+        val highestMessage =
+            "The highest recorded daily average was $highestStress/100 on $highestStressDay."
+
+        val recommendation =
+            when {
+
+                averageStress >= 75 ->
+                    "Consider using a short breathing exercise, taking a break, or discussing what is causing the stress in the MindMate chat."
+
+                averageStress >= 50 ->
+                    "Regular check-ins, short breaks, and calming activities may help you understand and manage your stress pattern."
+
+                trendSlope >= 3 ->
+                    "Continue monitoring the next few days to see whether the upward trend continues."
+
+                else ->
+                    "Continue the routines that appear to be supporting your wellbeing."
+            }
+
+        return "$averageMessage $trendMessage $highestMessage $recommendation"
     }
 }
