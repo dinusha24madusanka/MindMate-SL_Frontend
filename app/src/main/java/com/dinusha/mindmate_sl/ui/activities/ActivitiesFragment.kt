@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dinusha.mindmate_sl.R
 import com.dinusha.mindmate_sl.data.model.ExerciseItem
 import com.dinusha.mindmate_sl.data.model.GameItem
-
+import android.content.Intent
 class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
 
     private lateinit var tvStressStateTitle: TextView
@@ -71,44 +71,76 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
     }
 
     private fun setupGamesRecyclerView() {
-        // Mock data for Games (Figma එකේ තියෙන ඒවා)
+
         val gamesList = listOf(
+
             GameItem(
-                "Mind Reset Runner",
-                "An endless runner to clear your mind.",
-                "5 Mins",
+                "Mind Reset",
+                "A short focus game for a quick mental break.",
+                "2–5 Mins",
                 R.drawable.ic_activities,
-                "https://html5.gamedistribution.com/example1/"
+                "file:///android_asset/games/mind_reset.html"
             ),
+
             GameItem(
                 "Zen Blocks",
-                "An endless runner to clear your mind and reduce stress.",
+                "A simple concentration game.",
                 "5 Mins",
                 R.drawable.ic_activities,
-                "https://html5.gamedistribution.com/example2/"
+                ""
             ),
+
             GameItem(
-                "Flappy Bird",
-                "An endless runner to clear your mind.",
+                "Focus Flight",
+                "A light attention game.",
                 "5 Mins",
                 R.drawable.ic_activities,
-                "https://html5.gamedistribution.com/example3/"
+                ""
             )
         )
 
-        // Adapter එක සාදා Click ලොජික් එක WebView එකට Link කිරීම
-        val gamesAdapter = GamesAdapter(gamesList) { game ->
-            // WebView එක තියෙන Fragment එකට URL එක Pass කරලා Navigate කරන්න බන්
-            Toast.makeText(requireContext(), "Opening ${game.title} via WebView...", Toast.LENGTH_SHORT).show()
+        val gamesAdapter =
+            GamesAdapter(gamesList) { game ->
 
-            // උදා:
-            // val webFragment = WebViewFragment.newInstance(game.webUrl)
-            // parentFragmentManager.beginTransaction().replace(R.id.fragment_container, webFragment).addToBackStack(null).commit()
-        }
+                if (game.webUrl.isBlank()) {
+
+                    Toast.makeText(
+                        requireContext(),
+                        "${game.title} is coming soon.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    return@GamesAdapter
+                }
+
+                val intent =
+                    Intent(
+                        requireContext(),
+                        GameWebViewActivity::class.java
+                    )
+
+                intent.putExtra(
+                    GameWebViewActivity.EXTRA_TITLE,
+                    game.title
+                )
+
+                intent.putExtra(
+                    GameWebViewActivity.EXTRA_URL,
+                    game.webUrl
+                )
+
+                startActivity(intent)
+            }
 
         rvGames.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        rvGames.adapter = gamesAdapter
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+
+        rvGames.adapter =
+            gamesAdapter
     }
 
     private fun setupExercisesRecyclerView() {
@@ -134,9 +166,47 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
             )
         )
 
-        val exerciseAdapter = ExercisesAdapter(exerciseList) { exercise ->
-            Toast.makeText(requireContext(), "Starting ${exercise.title}", Toast.LENGTH_SHORT).show()
-        }
+        val exerciseAdapter =
+            ExercisesAdapter(exerciseList) { exercise ->
+
+                when {
+
+                    exercise.title.contains(
+                        "4 - 7 - 8",
+                        ignoreCase = true
+                    ) -> {
+
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                BreathingExerciseActivity::class.java
+                            )
+                        )
+                    }
+
+                    exercise.title.contains(
+                        "5-4-3-2-1",
+                        ignoreCase = true
+                    ) -> {
+
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                GroundingExerciseActivity::class.java
+                            )
+                        )
+                    }
+
+                    else -> {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Audio session will be added in the next step.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
 
         rvExercises.layoutManager = LinearLayoutManager(requireContext())
         rvExercises.adapter = exerciseAdapter

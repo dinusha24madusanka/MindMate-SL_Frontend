@@ -4,45 +4,78 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.dinusha.mindmate_sl.R
+import com.dinusha.mindmate_sl.ui.activities.ActivitiesFragment
 import com.dinusha.mindmate_sl.ui.chat.ChatFragment
+import com.dinusha.mindmate_sl.ui.community.CommunityFragment
 import com.dinusha.mindmate_sl.ui.journey.JourneyFragment
+import com.dinusha.mindmate_sl.ui.profile.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var bottomNavigation: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
-        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+        bottomNavigation =
+            findViewById(R.id.bottomNavigation)
 
-        // ඇප් එක ඔන් වෙද්දීම මුලින්ම ChatFragment එක ලෝඩ් කරනවා
         if (savedInstanceState == null) {
+
             loadFragment(ChatFragment())
+
+            bottomNavigation.selectedItemId =
+                R.id.nav_chat
         }
 
-        // ටැබ් ක්ලික් කරද්දී වෙනස් වෙන්න ඕන ලොජික් එක
         bottomNavigation.setOnItemSelectedListener { item ->
-            var selectedFragment: Fragment? = null
-            when (item.itemId) {
-                R.id.nav_chat -> selectedFragment = ChatFragment()
-                R.id.nav_journey -> selectedFragment =
-                    JourneyFragment() // දැනට Chat එකම දමු, පස්සේ Fragments හදලා මාරු කරමු
-                R.id.nav_activities -> selectedFragment = ChatFragment()
-                R.id.nav_community -> selectedFragment = ChatFragment()
-                R.id.nav_profile -> selectedFragment = ChatFragment()
-            }
+
+            val selectedFragment: Fragment? =
+                when (item.itemId) {
+
+                    R.id.nav_chat ->
+                        ChatFragment()
+
+                    R.id.nav_journey ->
+                        JourneyFragment()
+
+                    R.id.nav_activities ->
+                        ActivitiesFragment()
+
+                    R.id.nav_community ->
+                        CommunityFragment()
+
+                    R.id.nav_profile ->
+                        ProfileFragment()
+
+                    else ->
+                        null
+                }
+
             if (selectedFragment != null) {
+
                 loadFragment(selectedFragment)
+
+                true
+
+            } else {
+
+                false
             }
-            true
         }
     }
 
-    // Fragment එක Frame එක ඇතුළට දාන පොදු Function එක
     private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(
+                R.id.fragmentContainer,
+                fragment
+            )
             .commit()
     }
 }

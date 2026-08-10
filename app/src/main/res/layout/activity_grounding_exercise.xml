@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#054442"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5-4-3-2-1 Grounding"
+        android:textColor="#FFFFFF"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Take your time and notice your immediate surroundings."
+        android:textColor="#B2DFDB"
+        android:textSize="14sp" />
+
+    <ProgressBar
+        android:id="@+id/groundingProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:max="5"
+        android:progress="1" />
+
+    <TextView
+        android:id="@+id/tvGroundingStep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Step 1 of 5"
+        android:textColor="#80CBC4"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvGroundingPrompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Name 5 things you can see around you."
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etGroundingAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="24dp"
+        android:background="#FFFFFF"
+        android:gravity="top|start"
+        android:hint="Type what you notice..."
+        android:inputType="textMultiLine"
+        android:padding="16dp"
+        android:textColor="#000000"
+        android:textColorHint="#78909C" />
+
+    <Button
+        android:id="@+id/btnGroundingNext"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#00796B"
+        android:text="Next"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+</LinearLayout>
