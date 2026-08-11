@@ -75,11 +75,11 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
         val gamesList = listOf(
 
             GameItem(
-                "Mind Reset",
+                "Calm Bubbles",
                 "A short focus game for a quick mental break.",
                 "2–5 Mins",
                 R.drawable.ic_activities,
-                "file:///android_asset/games/mind_reset.html"
+                "file:///android_asset/games/calm_bubbles.html"
             ),
 
             GameItem(
@@ -191,6 +191,7 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
 
                         startActivity(
                             Intent(
+
                                 requireContext(),
                                 GroundingExerciseActivity::class.java
                             )

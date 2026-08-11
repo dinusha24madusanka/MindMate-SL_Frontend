@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>Calm Bubbles</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #063F3D 0%,
+                    #0E615D 55%,
+                    #B2DFDB 100%
+                );
+
+            color: white;
+        }
+
+        .header {
+            position: relative;
+            z-index: 10;
+
+            text-align: center;
+            padding: 18px 20px 8px;
+        }
+
+        .title {
+            margin: 0;
+
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            margin-top: 5px;
+
+            font-size: 14px;
+            color: #D9F3F1;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+
+            margin-top: 14px;
+        }
+
+        .info-card {
+            min-width: 110px;
+
+            padding: 9px 15px;
+
+            border-radius: 18px;
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
+            backdrop-filter: blur(4px);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #B2DFDB;
+        }
+
+        .info-value {
+            margin-top: 2px;
+
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #gameArea {
+            position: absolute;
+
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle at 30% 25%,
+                    rgba(255, 255, 255, 0.95),
+                    rgba(178, 223, 219, 0.75) 25%,
+                    rgba(128, 203, 196, 0.45) 65%,
+                    rgba(255, 255, 255, 0.15)
+                );
+
+            border:
+                1px solid rgba(255, 255, 255, 0.7);
+
+            box-shadow:
+                0 4px 20px rgba(255, 255, 255, 0.20);
+
+            animation:
+                floatUp linear forwards;
+
+            cursor: pointer;
+        }
+
+        .bubble::after {
+            content: "";
+
+            position: absolute;
+
+            width: 25%;
+            height: 25%;
+
+            top: 18%;
+            left: 20%;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 255, 255, 0.70);
+        }
+
+        @keyframes floatUp {
+
+            from {
+                transform:
+                    translateY(80px)
+                    scale(0.9);
+
+                opacity: 0.4;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            to {
+                transform:
+                    translateY(-120vh)
+                    scale(1.15);
+
+                opacity: 0;
+            }
+        }
+
+        .bubble.pop {
+
+            animation: none;
+
+            transform: scale(1.5);
+
+            opacity: 0;
+
+            transition:
+                transform 0.15s,
+                opacity 0.15s;
+        }
+
+        #startOverlay {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 100;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 30px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #063F3D,
+                    #0E615D
+                );
+
+            text-align: center;
+        }
+
+        #startOverlay h1 {
+
+            margin-bottom: 8px;
+
+            font-size: 32px;
+        }
+
+        #startOverlay p {
+
+            max-width: 300px;
+
+            line-height: 1.5;
+
+            color: #B2DFDB;
+        }
+
+        #startButton {
+
+            width: 210px;
+
+            margin-top: 25px;
+            padding: 15px;
+
+            border: none;
+            border-radius: 30px;
+
+            background: #FFFFFF;
+
+            color: #00574F;
+
+            font-size: 17px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1 class="title">
+        Calm Bubbles
+    </h1>
+
+    <div class="subtitle">
+        Take a short break and gently pop the bubbles
+    </div>
+
+    <div class="info-row">
+
+        <div class="info-card">
+
+            <div class="info-label">
+                TIME LEFT
+            </div>
+
+            <div
+                    class="info-value"
+                    id="timer">
+
+                01:00
+
+            </div>
+
+        </div>
+
+        <div class="info-card">
+
+            <div class="info-label">
+                BUBBLES
+            </div>
+
+            <div
+                    class="info-value"
+                    id="score">
+
+                0
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="gameArea"></div>
+
+
+<div id="startOverlay">
+
+    <div style="font-size:70px;">
+        🫧
+    </div>
+
+    <h1>
+        Calm Bubbles
+    </h1>
+
+    <p>
+        Give yourself a 60-second break.
+        Gently pop the floating bubbles and focus
+        only on the moment.
+    </p>
+
+    <button
+            id="startButton"
+            onclick="startGame()">
+
+        Start 60-sec Reset
+
+    </button>
+
+</div>
+
+
+<script>
+
+    const GAME_SECONDS = 10;
+
+    let timeLeft =
+        GAME_SECONDS;
+
+    let score =
+        0;
+
+    let gameRunning =
+        false;
+
+    let timerInterval =
+        null;
+
+    let bubbleInterval =
+        null;
+
+
+    const gameArea =
+        document.getElementById("gameArea");
+
+    const timerElement =
+        document.getElementById("timer");
+
+    const scoreElement =
+        document.getElementById("score");
+
+    const startOverlay =
+        document.getElementById("startOverlay");
+
+
+    function startGame() {
+
+        if (gameRunning) {
+            return;
+        }
+
+        gameRunning =
+            true;
+
+        score =
+            0;
+
+        timeLeft =
+            GAME_SECONDS;
+
+        scoreElement.innerText =
+            score;
+
+        updateTimer();
+
+        startOverlay.style.display =
+            "none";
+
+
+        createBubble();
+        createBubble();
+        createBubble();
+
+
+        bubbleInterval =
+            setInterval(
+                createBubble,
+                650
+            );
+
+
+        timerInterval =
+            setInterval(
+                function () {
+
+                    timeLeft--;
+
+                    updateTimer();
+
+                    if (timeLeft <= 0) {
+
+                        finishGame();
+
+                    }
+
+                },
+                1000
+            );
+    }
+
+
+    function updateTimer() {
+
+        const seconds =
+            String(timeLeft)
+                .padStart(2, "0");
+
+        timerElement.innerText =
+            "00:" + seconds;
+    }
+
+
+    function createBubble() {
+
+        if (!gameRunning) {
+            return;
+        }
+
+        const bubble =
+            document.createElement("div");
+
+        bubble.className =
+            "bubble";
+
+
+        const size =
+            Math.floor(
+                Math.random() * 35
+            ) + 50;
+
+
+        bubble.style.width =
+            size + "px";
+
+        bubble.style.height =
+            size + "px";
+
+
+        const maxX =
+            window.innerWidth -
+            size;
+
+        bubble.style.left =
+            Math.random() *
+            maxX +
+            "px";
+
+
+        bubble.style.bottom =
+            "-80px";
+
+
+        const duration =
+            Math.random() * 3 + 5;
+
+        bubble.style.animationDuration =
+            duration + "s";
+
+
+        bubble.addEventListener(
+            "click",
+            function () {
+
+                if (!gameRunning) {
+                    return;
+                }
+
+                score++;
+
+                scoreElement.innerText =
+                    score;
+
+                bubble.classList.add(
+                    "pop"
+                );
+
+                setTimeout(
+                    function () {
+
+                        bubble.remove();
+
+                    },
+                    150
+                );
+            }
+        );
+
+
+        bubble.addEventListener(
+            "animationend",
+            function () {
+
+                bubble.remove();
+
+            }
+        );
+
+
+        gameArea.appendChild(
+            bubble
+        );
+    }
+
+
+    function finishGame() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+    gameRunning = false;
+
+    clearInterval(timerInterval);
+    clearInterval(bubbleInterval);
+
+    timerElement.innerText = "00:00";
+
+    document
+        .querySelectorAll(".bubble")
+        .forEach(function (bubble) {
+            bubble.remove();
+        });
+
+    try {
+
+        if (typeof Android !== "undefined") {
+
+            Android.gameFinished(
+                "calm_bubbles",
+                String(score),
+                String(GAME_SECONDS)
+            );
+
+        } else {
+
+            alert(
+                "Game completed. Score: " + score
+            );
+        }
+
+    } catch (error) {
+
+        alert(
+            "Game completed, but Android communication failed: "
+            + error
+        );
+    }
+}
+
+</script>
+
+</body>
+
+</html>

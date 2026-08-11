@@ -20,6 +20,12 @@ import com.dinusha.mindmate_sl.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.content.Intent
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.button.MaterialButton
+import com.dinusha.mindmate_sl.ui.activities.GameWebViewActivity
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
@@ -29,14 +35,20 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private lateinit var etMessageInput: EditText
     private lateinit var btnSendMessage: ImageView
     private lateinit var rvChatMessages: RecyclerView
-
+    private lateinit var cardGameSuggestion: MaterialCardView
+    private lateinit var btnPlaySuggestedGame: MaterialButton
+    private lateinit var btnDismissGame: MaterialButton
     // Top Header Views (Green Circle Area)
     private lateinit var tvTopBarAvatarName: TextView
     private lateinit var ivTopBarAvatar: ImageView
-
     // Chat Data
     private val messageList = mutableListOf<ChatMessage>()
     private lateinit var chatAdapter: ChatAdapter
+    private lateinit var cardFeelingCheck: MaterialCardView
+
+    private lateinit var btnFeelingBetter: MaterialButton
+    private lateinit var btnFeelingSame: MaterialButton
+    private lateinit var btnStillStressed: MaterialButton
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,6 +61,15 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         rvChatMessages = view.findViewById(R.id.rvChatMessages)
         tvTopBarAvatarName = view.findViewById(R.id.tvTopBarAvatarName)
         ivTopBarAvatar = view.findViewById(R.id.ivTopBarAvatar)
+        cardGameSuggestion = view.findViewById(R.id.cardGameSuggestion)
+        btnPlaySuggestedGame = view.findViewById(R.id.btnPlaySuggestedGame)
+        btnDismissGame = view.findViewById(R.id.btnDismissGame)
+        cardGameSuggestion.visibility = View.GONE
+        cardFeelingCheck = view.findViewById(R.id.cardFeelingCheck)
+        btnFeelingBetter = view.findViewById(R.id.btnFeelingBetter)
+        btnFeelingSame = view.findViewById(R.id.btnFeelingSame)
+        btnStillStressed = view.findViewById(R.id.btnStillStressed)
+        cardFeelingCheck.visibility = View.GONE
 
         // 2. තෝරාගත් රොබෝවා අනුව ඉහළ Header එක සැකසීම
         setupTopHeader()
@@ -86,11 +107,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                             receiveBotResponse(aiReply, stressScore)
 
                         } else {
-
-                            receiveBotResponse(
-                                "Error: සේවාදායකය සමඟ සම්බන්ධ වීමට නොහැක.",
-                                50
-                            )
+                            receiveBotResponse("Server error, please try again later.", 50)
                         }
                     }
 
@@ -101,11 +118,128 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             }
         }
 
+        btnPlaySuggestedGame.setOnClickListener {
+
+            cardGameSuggestion.visibility =
+                View.GONE
+
+            val intent =
+                Intent(
+                    requireContext(),
+                    GameWebViewActivity::class.java
+                )
+
+            intent.putExtra(
+                GameWebViewActivity.EXTRA_TITLE,
+                "Calm Bubbles"
+            )
+
+            intent.putExtra(
+                GameWebViewActivity.EXTRA_URL,
+                "file:///android_asset/games/calm_bubbles.html"
+            )
+
+            gameLauncher.launch(intent)
+        }
+
+
+        btnDismissGame.setOnClickListener {
+
+            cardGameSuggestion.visibility =
+                View.GONE
+
+            addBotMessage(
+                "No problem 🌿 We can keep chatting."
+            )
+        }
+
+        btnFeelingBetter.setOnClickListener {
+
+            saveActivityFeedback(
+                "BETTER"
+            )
+
+            cardFeelingCheck.visibility =
+                View.GONE
+
+            addBotMessage(
+                "I'm glad the short break felt helpful 🌿 Whenever you're ready, we can keep chatting."
+            )
+        }
+
+
+        btnFeelingSame.setOnClickListener {
+
+            saveActivityFeedback(
+                "SAME"
+            )
+
+            cardFeelingCheck.visibility =
+                View.GONE
+
+            addBotMessage(
+                "That's okay 🌿 A short break doesn't always change how we feel immediately. We can keep chatting or try another activity."
+            )
+        }
+
+
+        btnStillStressed.setOnClickListener {
+
+            saveActivityFeedback(
+                "STILL_STRESSED"
+            )
+
+            cardFeelingCheck.visibility =
+                View.GONE
+
+            addBotMessage(
+                "Thanks for telling me. You can try a guided breathing or grounding exercise next, or stay here and keep chatting with me."
+            )
+        }
+
         // Default ආරම්භක තත්ත්වය (පරණ ස්කෝර් එකක් නැත්නම් මැද අගය 50 ගනී)
         val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
         val lastSavedScore = sharedPreferences.getInt("LAST_STRESS_SCORE", 50)
         updateAvatarAndMood(lastSavedScore)
     }
+
+    private val gameLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val data = result.data
+
+                val gameId =
+                    data?.getStringExtra(
+                        GameWebViewActivity.RESULT_GAME_ID
+                    ) ?: ""
+
+                val score =
+                    data?.getIntExtra(
+                        GameWebViewActivity.RESULT_GAME_SCORE,
+                        0
+                    ) ?: 0
+
+                val points =
+                    data?.getIntExtra(
+                        GameWebViewActivity.RESULT_POINTS,
+                        0
+                    ) ?: 0
+
+                if (gameId.isNotEmpty()) {
+
+                    onMiniGameCompleted(
+                        gameId,
+                        score,
+                        points
+                    )
+                }
+            }
+        }
+
 
     /**
      * තෝරාගත් රොබෝවරයා අනුව ඉහළ Header එකේ නම සහ Icon එක ගතිකව වෙනස් කිරීම
@@ -172,10 +306,77 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         // 2. රොබෝගේ පෙනුම වෙනස් කිරීම
         updateAvatarAndMood(stressScore)
 
-        // 3. ලිස්ට් එකට දත්ත එකතු කර සිනිදුවට UI එක Update කිරීම
-        messageList.add(ChatMessage(reply, isUser = false))
-        chatAdapter.notifyItemInserted(messageList.size - 1)
-        rvChatMessages.scrollToPosition(messageList.size - 1)
+        // 3. Stress Score එක අනුව ක්‍රියාකාරකම් යෝජනා කිරීම
+        handleActivitySuggestion(stressScore)
+
+        // 4. රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම
+        addBotMessage(reply)
+    }
+
+
+    /**
+     * රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම
+     */
+    private fun addBotMessage(message: String) {
+
+        messageList.add(
+            ChatMessage(
+                message,
+                isUser = false
+            )
+        )
+
+        chatAdapter.notifyItemInserted(
+            messageList.size - 1
+        )
+
+        rvChatMessages.scrollToPosition(
+            messageList.size - 1
+        )
+    }
+
+    /**
+     * Stress Score එක අනුව ක්‍රීඩා හෝ වෙනත් ක්‍රියාකාරකම් යෝජනා කිරීම
+     */
+    private fun handleActivitySuggestion(stressScore: Int) {
+        if (stressScore > 70) {
+            cardGameSuggestion.visibility = View.VISIBLE
+        } else {
+            cardGameSuggestion.visibility = View.GONE
+        }
+    }
+
+    private fun onMiniGameCompleted(
+        gameId: String,
+        score: Int,
+        points: Int
+    ) {
+
+        cardGameSuggestion.visibility =
+            View.GONE
+
+        addBotMessage(
+            "Welcome back 🌿 You completed your 60-second reset and earned +$points MindPoints. How are you feeling now?"
+        )
+        // Show the feeling check card
+        cardFeelingCheck.visibility = View.VISIBLE
+    }
+
+    private fun saveActivityFeedback(
+        feedback: String
+    ) {
+
+        requireContext()
+            .getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+            .edit()
+            .putString(
+                "LAST_ACTIVITY_FEEDBACK",
+                feedback
+            )
+            .apply()
     }
 
     private fun saveStressScoreToJourney(stressScore: Int) {
