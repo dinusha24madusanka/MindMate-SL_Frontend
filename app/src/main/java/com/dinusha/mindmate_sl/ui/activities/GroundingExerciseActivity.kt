@@ -8,6 +8,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.dinusha.mindmate_sl.R
+import android.content.Context
+import android.content.Intent
 
 class GroundingExerciseActivity : AppCompatActivity() {
 
@@ -113,12 +115,63 @@ class GroundingExerciseActivity : AppCompatActivity() {
 
     private fun completeExercise() {
 
+        addMindPoints(15)
+
+        val resultIntent = Intent().apply {
+
+            putExtra(
+                RESULT_ACTIVITY_TYPE,
+                "GROUNDING"
+            )
+
+            putExtra(
+                RESULT_POINTS,
+                15
+            )
+        }
+
+        setResult(
+            RESULT_OK,
+            resultIntent
+        )
+
         Toast.makeText(
             this,
-            "Grounding exercise completed.",
+            "Grounding exercise completed. +15 MindPoints",
             Toast.LENGTH_SHORT
         ).show()
 
         finish()
+    }
+
+    private fun addMindPoints(points: Int) {
+
+        val prefs =
+            getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+
+        val currentPoints =
+            prefs.getInt(
+                "MIND_POINTS",
+                0
+            )
+
+        prefs.edit()
+            .putInt(
+                "MIND_POINTS",
+                currentPoints + points
+            )
+            .apply()
+    }
+
+    companion object {
+
+        const val RESULT_ACTIVITY_TYPE =
+            "result_activity_type"
+
+        const val RESULT_POINTS =
+            "result_points"
     }
 }

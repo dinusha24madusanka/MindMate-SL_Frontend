@@ -7,6 +7,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.dinusha.mindmate_sl.R
+import android.content.Context
+import android.content.Intent
 
 class BreathingExerciseActivity : AppCompatActivity() {
 
@@ -156,13 +158,60 @@ class BreathingExerciseActivity : AppCompatActivity() {
         tvPhase.text = "Completed"
         tvTimer.text = "✓"
 
-        btnStart.text = "Start Again"
+        btnStart.text = "Completed"
+        btnStart.isEnabled = false
+
+        // Add MindPoints
+        addMindPoints(15)
+
+        // Return result to ChatFragment
+        val resultIntent = Intent().apply {
+
+            putExtra(
+                RESULT_ACTIVITY_TYPE,
+                "BREATHING"
+            )
+
+            putExtra(
+                RESULT_POINTS,
+                15
+            )
+        }
+
+        setResult(
+            RESULT_OK,
+            resultIntent
+        )
 
         Toast.makeText(
             this,
-            "Breathing session completed.",
+            "Breathing session completed. +15 MindPoints",
             Toast.LENGTH_SHORT
         ).show()
+
+        finish()
+    }
+
+    private fun addMindPoints(points: Int) {
+
+        val prefs =
+            getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+
+        val currentPoints =
+            prefs.getInt(
+                "MIND_POINTS",
+                0
+            )
+
+        prefs.edit()
+            .putInt(
+                "MIND_POINTS",
+                currentPoints + points
+            )
+            .apply()
     }
 
     private fun stopExercise() {
@@ -189,5 +238,14 @@ class BreathingExerciseActivity : AppCompatActivity() {
         currentTimer?.cancel()
 
         super.onDestroy()
+    }
+
+    companion object {
+
+        const val RESULT_ACTIVITY_TYPE =
+            "result_activity_type"
+
+        const val RESULT_POINTS =
+            "result_points"
     }
 }

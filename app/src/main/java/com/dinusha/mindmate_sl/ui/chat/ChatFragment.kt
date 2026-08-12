@@ -26,7 +26,8 @@ import com.google.android.material.button.MaterialButton
 import com.dinusha.mindmate_sl.ui.activities.GameWebViewActivity
 import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
-
+import com.dinusha.mindmate_sl.ui.activities.BreathingExerciseActivity
+import com.dinusha.mindmate_sl.ui.activities.GroundingExerciseActivity
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     // Views
@@ -45,10 +46,14 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private val messageList = mutableListOf<ChatMessage>()
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var cardFeelingCheck: MaterialCardView
-
     private lateinit var btnFeelingBetter: MaterialButton
     private lateinit var btnFeelingSame: MaterialButton
     private lateinit var btnStillStressed: MaterialButton
+    private lateinit var cardSupportActivity: MaterialCardView
+    private lateinit var btnSuggestedBreathing: MaterialButton
+    private lateinit var btnSuggestedGrounding: MaterialButton
+    private lateinit var btnKeepChatting: MaterialButton
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -70,6 +75,19 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         btnFeelingSame = view.findViewById(R.id.btnFeelingSame)
         btnStillStressed = view.findViewById(R.id.btnStillStressed)
         cardFeelingCheck.visibility = View.GONE
+        cardSupportActivity =
+            view.findViewById(R.id.cardSupportActivity)
+
+        btnSuggestedBreathing =
+            view.findViewById(R.id.btnSuggestedBreathing)
+
+        btnSuggestedGrounding =
+            view.findViewById(R.id.btnSuggestedGrounding)
+
+        btnKeepChatting =
+            view.findViewById(R.id.btnKeepChatting)
+
+        cardSupportActivity.visibility = View.GONE
 
         // 2. තෝරාගත් රොබෝවා අනුව ඉහළ Header එක සැකසීම
         setupTopHeader()
@@ -116,6 +134,34 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     }
                 })
             }
+        }
+
+        btnSuggestedBreathing.setOnClickListener {
+
+            cardSupportActivity.visibility =
+                View.GONE
+
+            val intent =
+                Intent(
+                    requireContext(),
+                    BreathingExerciseActivity::class.java
+                )
+
+            supportActivityLauncher.launch(intent)
+        }
+
+        btnSuggestedGrounding.setOnClickListener {
+
+            cardSupportActivity.visibility =
+                View.GONE
+
+            val intent =
+                Intent(
+                    requireContext(),
+                    GroundingExerciseActivity::class.java
+                )
+
+            supportActivityLauncher.launch(intent)
         }
 
         btnPlaySuggestedGame.setOnClickListener {
@@ -189,11 +235,27 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 "STILL_STRESSED"
             )
 
+            // Feeling card hide
             cardFeelingCheck.visibility =
                 View.GONE
 
+            // MindMate response
             addBotMessage(
-                "Thanks for telling me. You can try a guided breathing or grounding exercise next, or stay here and keep chatting with me."
+                "Thanks for telling me 🌿 Let's try another short activity that feels comfortable for you."
+            )
+
+            // Show support activity options
+            cardSupportActivity.visibility =
+                View.VISIBLE
+        }
+
+        btnKeepChatting.setOnClickListener {
+
+            cardSupportActivity.visibility =
+                View.GONE
+
+            addBotMessage(
+                "Of course 💬 I'm here. Tell me what's on your mind."
             )
         }
 
@@ -234,6 +296,55 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     onMiniGameCompleted(
                         gameId,
                         score,
+                        points
+                    )
+                }
+            }
+        }
+
+    private fun handleSupportActivityCompleted(
+        activityType: String,
+        points: Int
+    ) {
+        cardSupportActivity.visibility = View.GONE
+
+        val activityName = when (activityType) {
+            "BREATHING" -> "4-7-8 breathing session"
+            "GROUNDING" -> "5-4-3-2-1 grounding exercise"
+            else -> "support activity"
+        }
+
+        addBotMessage(
+            "Welcome back 🌿 You completed the $activityName and earned +$points MindPoints. Take a moment and notice how you're feeling now."
+        )
+
+        cardFeelingCheck.visibility = View.VISIBLE
+    }
+
+    private val supportActivityLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val data = result.data
+
+                val activityType =
+                    data?.getStringExtra(
+                        BreathingExerciseActivity.RESULT_ACTIVITY_TYPE
+                    ) ?: ""
+
+                val points =
+                    data?.getIntExtra(
+                        BreathingExerciseActivity.RESULT_POINTS,
+                        0
+                    ) ?: 0
+
+                if (activityType.isNotEmpty()) {
+
+                    handleSupportActivityCompleted(
+                        activityType,
                         points
                     )
                 }
@@ -424,4 +535,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             )
             .apply()
     }
+
+
 }

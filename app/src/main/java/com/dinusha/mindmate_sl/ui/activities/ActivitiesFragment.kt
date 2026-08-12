@@ -78,7 +78,7 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
                 "Calm Bubbles",
                 "A short focus game for a quick mental break.",
                 "2–5 Mins",
-                R.drawable.ic_activities,
+                R.drawable.calm_bubbles_cover,
                 "file:///android_asset/games/calm_bubbles.html"
             ),
 
