@@ -79,25 +79,15 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         btnFeelingSame = view.findViewById(R.id.btnFeelingSame)
         btnStillStressed = view.findViewById(R.id.btnStillStressed)
         cardFeelingCheck.visibility = View.GONE
-        cardSupportActivity =
-            view.findViewById(R.id.cardSupportActivity)
-
-        btnSuggestedBreathing =
-            view.findViewById(R.id.btnSuggestedBreathing)
-
-        btnSuggestedGrounding =
-            view.findViewById(R.id.btnSuggestedGrounding)
-
-        btnKeepChatting =
-            view.findViewById(R.id.btnKeepChatting)
-
+        cardSupportActivity = view.findViewById(R.id.cardSupportActivity)
+        btnSuggestedBreathing = view.findViewById(R.id.btnSuggestedBreathing)
+        btnSuggestedGrounding = view.findViewById(R.id.btnSuggestedGrounding)
+        btnKeepChatting =view.findViewById(R.id.btnKeepChatting)
         cardSupportActivity.visibility = View.GONE
 
-        // 2. තෝරාගත් රොබෝවා අනුව ඉහළ Header එක සැකසීම
+        // 2. Configuring the top header based on the selected robot
         setupTopHeader()
-
-        tvGameSuggestion =
-            view.findViewById(R.id.tvGameSuggestion)
+        tvGameSuggestion =view.findViewById(R.id.tvGameSuggestion)
 
         // 3. Setup RecyclerView
         chatAdapter = ChatAdapter(messageList)
@@ -108,10 +98,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         btnSendMessage.setOnClickListener {
             val messageText = etMessageInput.text.toString().trim()
             if (messageText.isNotEmpty()) {
-                // පරිශීලකයාගේ පණිවිඩය එකතු කිරීම
+                // Adding the user's message
                 messageList.add(ChatMessage(messageText, isUser = true))
 
-                // Optimized update: notifyDataSetChanged() වෙනුවට නිවැරදි ක්‍රමය
+                // Optimized update: The correct method instead of notifyDataSetChanged()
                 chatAdapter.notifyItemInserted(messageList.size - 1)
                 rvChatMessages.scrollToPosition(messageList.size - 1)
                 etMessageInput.text.clear()
@@ -212,31 +202,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
             supportActivityLauncher.launch(intent)
         }
-
-        btnPlaySuggestedGame.setOnClickListener {
-
-            cardGameSuggestion.visibility =
-                View.GONE
-
-            val intent =
-                Intent(
-                    requireContext(),
-                    GameWebViewActivity::class.java
-                )
-
-            intent.putExtra(
-                GameWebViewActivity.EXTRA_TITLE,
-                "Calm Bubbles"
-            )
-
-            intent.putExtra(
-                GameWebViewActivity.EXTRA_URL,
-                "file:///android_asset/games/calm_bubbles.html"
-            )
-
-            gameLauncher.launch(intent)
-        }
-
 
         btnDismissGame.setOnClickListener {
 
