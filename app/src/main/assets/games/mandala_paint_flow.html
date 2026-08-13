@@ -1,222 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mandala Paint Flow</title>
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-:root{
-  --ink:#073f3a;
-  --ink2:#0b5c54;
-  --muted:#6d8581;
-  --teal:#0a8176;
-  --teal2:#28b6a5;
-  --mint:#79e2d1;
-  --aqua:#d9faf4;
-  --cream:#fbfffe;
-  --glass:rgba(255,255,255,.90);
-  --soft:#eaf8f5;
-  --line:rgba(55,108,100,.18);
-  --shadow:0 18px 45px rgba(8,80,72,.12);
-}
-html,body{
-  margin:0;width:100%;min-height:100%;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(circle at 8% -3%,rgba(255,255,255,1) 0 13%,transparent 32%),
-    radial-gradient(circle at 102% 5%,rgba(151,211,255,.45) 0 12%,transparent 32%),
-    radial-gradient(circle at 55% 35%,rgba(110,231,209,.18),transparent 32%),
-    linear-gradient(155deg,#f2fffc 0%,#d8f5ef 48%,#c4ebe4 100%);
-}
-body{overflow-x:hidden}
-.hidden{display:none!important}
-button{font-family:inherit}
-button:active{transform:scale(.975)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mandala Paint Flow</title>
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+    :root{
+      --ink:#073f3a;
+      --ink2:#0b5c54;
+      --muted:#6d8581;
+      --teal:#0a8176;
+      --teal2:#28b6a5;
+      --mint:#79e2d1;
+      --aqua:#d9faf4;
+      --cream:#fbfffe;
+      --glass:rgba(255,255,255,.90);
+      --soft:#eaf8f5;
+      --line:rgba(55,108,100,.18);
+      --shadow:0 18px 45px rgba(8,80,72,.12);
+    }
+    html,body{
+      margin:0;width:100%;min-height:100%;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 8% -3%,rgba(255,255,255,1) 0 13%,transparent 32%),
+        radial-gradient(circle at 102% 5%,rgba(151,211,255,.45) 0 12%,transparent 32%),
+        radial-gradient(circle at 55% 35%,rgba(110,231,209,.18),transparent 32%),
+        linear-gradient(155deg,#f2fffc 0%,#d8f5ef 48%,#c4ebe4 100%);
+    }
+    body{overflow-x:hidden}
+    .hidden{display:none!important}
+    button{font-family:inherit}
+    button:active{transform:scale(.975)}
 
-/* ---------- HOME / LEVEL MAP ---------- */
-.screen{min-height:100vh;padding:18px 15px 30px;position:relative;overflow:hidden}
-#homeScreen::before{
-  content:"";position:absolute;left:-105px;top:145px;width:235px;height:235px;border-radius:50%;
-  border:1px solid rgba(10,129,118,.11);box-shadow:0 0 0 22px rgba(10,129,118,.025),0 0 0 46px rgba(10,129,118,.02);pointer-events:none
-}
-#homeScreen::after{
-  content:"";position:absolute;right:-85px;top:34px;width:190px;height:190px;border-radius:50%;
-  background:radial-gradient(circle,rgba(77,207,190,.18),rgba(77,207,190,0) 70%);pointer-events:none
-}
-.brand{
-  position:relative;z-index:2;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;
-  background:rgba(255,255,255,.72);backdrop-filter:blur(14px);
-  border:1px solid rgba(255,255,255,.92);font-size:10px;font-weight:850;letter-spacing:.2px;
-  box-shadow:0 8px 22px rgba(15,91,82,.08)
-}
-.heroTitle{
-  position:relative;z-index:2;font-size:34px;line-height:1.02;font-weight:950;letter-spacing:-1.15px;
-  margin:15px 0 7px;color:#064a44;text-shadow:0 2px 0 rgba(255,255,255,.55)
-}
-.heroTitle::after{
-  content:"";display:block;width:58px;height:5px;border-radius:999px;margin-top:9px;
-  background:linear-gradient(90deg,#0a8176,#66d7c6)
-}
-.heroText{
-  position:relative;z-index:2;font-size:12.5px;line-height:1.55;color:#5e7773;max-width:96%;font-weight:500
-}
-.featurePills{
-  position:relative;z-index:2;display:flex;gap:7px;flex-wrap:wrap;margin-top:12px
-}
-.featurePill{
-  display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;
-  background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(10px);
-  font-size:9px;font-weight:850;color:#3f6b65;box-shadow:0 5px 14px rgba(15,91,82,.055)
-}
+    /* ---------- HOME / LEVEL MAP ---------- */
+    .screen{min-height:100vh;padding:18px 15px 30px;position:relative;overflow:hidden}
+    #homeScreen::before{
+      content:"";position:absolute;left:-105px;top:145px;width:235px;height:235px;border-radius:50%;
+      border:1px solid rgba(10,129,118,.11);box-shadow:0 0 0 22px rgba(10,129,118,.025),0 0 0 46px rgba(10,129,118,.02);pointer-events:none
+    }
+    #homeScreen::after{
+      content:"";position:absolute;right:-85px;top:34px;width:190px;height:190px;border-radius:50%;
+      background:radial-gradient(circle,rgba(77,207,190,.18),rgba(77,207,190,0) 70%);pointer-events:none
+    }
+    .brand{
+      position:relative;z-index:2;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;
+      background:rgba(255,255,255,.72);backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.92);font-size:10px;font-weight:850;letter-spacing:.2px;
+      box-shadow:0 8px 22px rgba(15,91,82,.08)
+    }
+    .heroTitle{
+      position:relative;z-index:2;font-size:34px;line-height:1.02;font-weight:950;letter-spacing:-1.15px;
+      margin:15px 0 7px;color:#064a44;text-shadow:0 2px 0 rgba(255,255,255,.55)
+    }
+    .heroTitle::after{
+      content:"";display:block;width:58px;height:5px;border-radius:999px;margin-top:9px;
+      background:linear-gradient(90deg,#0a8176,#66d7c6)
+    }
+    .heroText{
+      position:relative;z-index:2;font-size:12.5px;line-height:1.55;color:#5e7773;max-width:96%;font-weight:500
+    }
+    .featurePills{
+      position:relative;z-index:2;display:flex;gap:7px;flex-wrap:wrap;margin-top:12px
+    }
+    .featurePill{
+      display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;
+      background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(10px);
+      font-size:9px;font-weight:850;color:#3f6b65;box-shadow:0 5px 14px rgba(15,91,82,.055)
+    }
 
-/* current-level hero card */
-.continueCard{
-  position:relative;z-index:2;margin-top:18px;padding:18px;border-radius:29px;overflow:hidden;
-  background:
-    radial-gradient(circle at 91% 12%,rgba(151,242,224,.42),transparent 31%),
-    linear-gradient(135deg,#075d57 0%,#087b70 55%,#20aa99 100%);
-  box-shadow:0 20px 45px rgba(5,101,91,.25);
-  border:1px solid rgba(255,255,255,.18)
-}
-.continueCard::before{
-  content:"";position:absolute;width:175px;height:175px;border-radius:50%;right:-76px;bottom:-93px;
-  border:1px solid rgba(255,255,255,.16);box-shadow:0 0 0 19px rgba(255,255,255,.025),0 0 0 40px rgba(255,255,255,.02)
-}
-.continueCard::after{
-  content:"✦";position:absolute;right:21px;top:17px;color:rgba(255,255,255,.38);font-size:25px
-}
-.continueTop{display:flex;align-items:center;gap:13px;position:relative;z-index:2}
-.continueIcon{
-  width:62px;height:62px;flex:0 0 62px;border-radius:21px;display:grid;place-items:center;font-size:31px;
-  background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(211,255,247,.78));
-  border:1px solid rgba(255,255,255,.74);box-shadow:0 12px 28px rgba(0,0,0,.16),inset 0 1px 0 white;
-  animation:floatIcon 3.5s ease-in-out infinite
-}
-@keyframes floatIcon{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
-.continueInfo{flex:1;min-width:0}
-.continueLabel{font-size:9px;color:rgba(232,255,250,.78);font-weight:900;letter-spacing:1.05px}
-.continueName{font-size:18px;color:white;font-weight:950;margin-top:3px;letter-spacing:-.25px}
-.continueProgress{font-size:10.5px;color:rgba(232,255,250,.82);margin-top:4px;font-weight:600}
-.continueMiniTrack{height:6px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden;margin-top:12px;position:relative;z-index:2}
-#continueMiniBar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#dffff8,#82ead9);box-shadow:0 0 12px rgba(203,255,246,.7);transition:width .25s ease}
-.primaryBtn{
-  position:relative;z-index:2;width:100%;height:50px;margin-top:13px;border:0;border-radius:17px;
-  background:linear-gradient(180deg,#ffffff,#e9fff9);color:#08645b;font-weight:950;font-size:13px;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);letter-spacing:.1px
-}
-.primaryBtn::after{content:"  →";font-size:17px}
+    /* current-level hero card */
+    .continueCard{
+      position:relative;z-index:2;margin-top:18px;padding:18px;border-radius:29px;overflow:hidden;
+      background:
+        radial-gradient(circle at 91% 12%,rgba(151,242,224,.42),transparent 31%),
+        linear-gradient(135deg,#075d57 0%,#087b70 55%,#20aa99 100%);
+      box-shadow:0 20px 45px rgba(5,101,91,.25);
+      border:1px solid rgba(255,255,255,.18)
+    }
+    .continueCard::before{
+      content:"";position:absolute;width:175px;height:175px;border-radius:50%;right:-76px;bottom:-93px;
+      border:1px solid rgba(255,255,255,.16);box-shadow:0 0 0 19px rgba(255,255,255,.025),0 0 0 40px rgba(255,255,255,.02)
+    }
+    .continueCard::after{
+      content:"✦";position:absolute;right:21px;top:17px;color:rgba(255,255,255,.38);font-size:25px
+    }
+    .continueTop{display:flex;align-items:center;gap:13px;position:relative;z-index:2}
+    .continueIcon{
+      width:62px;height:62px;flex:0 0 62px;border-radius:21px;display:grid;place-items:center;font-size:31px;
+      background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(211,255,247,.78));
+      border:1px solid rgba(255,255,255,.74);box-shadow:0 12px 28px rgba(0,0,0,.16),inset 0 1px 0 white;
+      animation:floatIcon 3.5s ease-in-out infinite
+    }
+    @keyframes floatIcon{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+    .continueInfo{flex:1;min-width:0}
+    .continueLabel{font-size:9px;color:rgba(232,255,250,.78);font-weight:900;letter-spacing:1.05px}
+    .continueName{font-size:18px;color:white;font-weight:950;margin-top:3px;letter-spacing:-.25px}
+    .continueProgress{font-size:10.5px;color:rgba(232,255,250,.82);margin-top:4px;font-weight:600}
+    .continueMiniTrack{height:6px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden;margin-top:12px;position:relative;z-index:2}
+    #continueMiniBar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#dffff8,#82ead9);box-shadow:0 0 12px rgba(203,255,246,.7);transition:width .25s ease}
+    .primaryBtn{
+      position:relative;z-index:2;width:100%;height:50px;margin-top:13px;border:0;border-radius:17px;
+      background:linear-gradient(180deg,#ffffff,#e9fff9);color:#08645b;font-weight:950;font-size:13px;
+      box-shadow:0 10px 25px rgba(0,0,0,.15);letter-spacing:.1px
+    }
+    .primaryBtn::after{content:"  →";font-size:17px}
 
-.sectionHeader{display:flex;align-items:flex-end;justify-content:space-between;margin:23px 2px 11px;position:relative;z-index:2}
-.sectionTitle{font-size:12px;font-weight:950;letter-spacing:.7px;margin:0;color:#0a574f}
-.sectionSub{font-size:9px;color:#78908d;font-weight:750}
+    .sectionHeader{display:flex;align-items:flex-end;justify-content:space-between;margin:23px 2px 11px;position:relative;z-index:2}
+    .sectionTitle{font-size:12px;font-weight:950;letter-spacing:.7px;margin:0;color:#0a574f}
+    .sectionSub{font-size:9px;color:#78908d;font-weight:750}
 
-/* premium level cards */
-.levels{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.levelCard{
-  position:relative;border:1px solid rgba(255,255,255,.95);border-radius:24px;background:rgba(255,255,255,.88);
-  backdrop-filter:blur(12px);padding:10px;text-align:left;color:var(--ink);box-shadow:0 13px 30px rgba(27,95,87,.095);
-  min-height:172px;overflow:hidden;transition:transform .17s ease,box-shadow .17s ease,opacity .17s ease
-}
-.levelCard:not(.locked):active{transform:scale(.965)}
-.levelCard.current{box-shadow:0 14px 34px rgba(10,129,118,.18);outline:2px solid rgba(24,174,157,.2)}
-.levelCard.locked{opacity:.64;filter:saturate(.72)}
-.levelCard.locked::after{
-  content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(245,252,250,.05),rgba(220,239,235,.19));pointer-events:none
-}
-.levelArt{
-  height:96px;border-radius:18px;position:relative;display:grid;place-items:center;overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 50%,rgba(255,255,255,.95) 0 18%,transparent 19%),
-    linear-gradient(145deg,#f9fffd,#dff5f0)
-}
-.levelCard:nth-child(1) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#fff4f9,#e7f9f3)}
-.levelCard:nth-child(2) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#edf8ff,#e4f7f4)}
-.levelCard:nth-child(3) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#f4ffe9,#e4f7ee)}
-.levelCard:nth-child(4) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#fff9de,#eaf8ef)}
-.levelCard:nth-child(5) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#f4efff,#e7f6f5)}
-.levelCard:nth-child(6) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#eef9ff,#e9f2ff)}
-.levelArt::before,.levelArt::after{
-  content:"";position:absolute;border:1.5px solid rgba(10,129,118,.17);border-radius:50%;inset:12px;animation:slowSpin 18s linear infinite
-}
-.levelArt::after{inset:27px;border-style:dashed;animation-direction:reverse;animation-duration:13s}
-@keyframes slowSpin{to{transform:rotate(360deg)}}
-.levelEmoji{font-size:39px;z-index:2;filter:drop-shadow(0 7px 9px rgba(0,0,0,.09))}
-.levelNo{font-size:8.5px;color:#78908c;font-weight:900;margin-top:9px;letter-spacing:.8px}
-.levelName{font-size:13.5px;font-weight:950;margin-top:2px;letter-spacing:-.15px}
-.levelMeta{font-size:9px;color:#7a8e8b;margin-top:3px;font-weight:650}
-.badge{
-  position:absolute;top:8px;right:8px;padding:5px 7px;border-radius:999px;background:rgba(255,255,255,.92);
-  box-shadow:0 5px 12px rgba(20,75,69,.09);font-size:8px;font-weight:950;color:#386b65;z-index:5
-}
-.levelMiniProgress{height:5px;border-radius:999px;background:#e7f2ef;overflow:hidden;margin-top:9px}
-.levelMiniProgress>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#14a391,#71d7c7)}
-.levelFooter{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:8px;font-weight:850;color:#7c908d}
-.levelArrow{font-size:13px;color:#158c80}
+    /* premium level cards */
+    .levels{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .levelCard{
+      position:relative;border:1px solid rgba(255,255,255,.95);border-radius:24px;background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);padding:10px;text-align:left;color:var(--ink);box-shadow:0 13px 30px rgba(27,95,87,.095);
+      min-height:172px;overflow:hidden;transition:transform .17s ease,box-shadow .17s ease,opacity .17s ease
+    }
+    .levelCard:not(.locked):active{transform:scale(.965)}
+    .levelCard.current{box-shadow:0 14px 34px rgba(10,129,118,.18);outline:2px solid rgba(24,174,157,.2)}
+    .levelCard.locked{opacity:.64;filter:saturate(.72)}
+    .levelCard.locked::after{
+      content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(245,252,250,.05),rgba(220,239,235,.19));pointer-events:none
+    }
+    .levelArt{
+      height:96px;border-radius:18px;position:relative;display:grid;place-items:center;overflow:hidden;
+      background:
+        radial-gradient(circle at 50% 50%,rgba(255,255,255,.95) 0 18%,transparent 19%),
+        linear-gradient(145deg,#f9fffd,#dff5f0)
+    }
+    .levelCard:nth-child(1) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#fff4f9,#e7f9f3)}
+    .levelCard:nth-child(2) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#edf8ff,#e4f7f4)}
+    .levelCard:nth-child(3) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#f4ffe9,#e4f7ee)}
+    .levelCard:nth-child(4) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#fff9de,#eaf8ef)}
+    .levelCard:nth-child(5) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#f4efff,#e7f6f5)}
+    .levelCard:nth-child(6) .levelArt{background:radial-gradient(circle at center,#fff 0 16%,transparent 17%),linear-gradient(145deg,#eef9ff,#e9f2ff)}
+    .levelArt::before,.levelArt::after{
+      content:"";position:absolute;border:1.5px solid rgba(10,129,118,.17);border-radius:50%;inset:12px;animation:slowSpin 18s linear infinite
+    }
+    .levelArt::after{inset:27px;border-style:dashed;animation-direction:reverse;animation-duration:13s}
+    @keyframes slowSpin{to{transform:rotate(360deg)}}
+    .levelEmoji{font-size:39px;z-index:2;filter:drop-shadow(0 7px 9px rgba(0,0,0,.09))}
+    .levelNo{font-size:8.5px;color:#78908c;font-weight:900;margin-top:9px;letter-spacing:.8px}
+    .levelName{font-size:13.5px;font-weight:950;margin-top:2px;letter-spacing:-.15px}
+    .levelMeta{font-size:9px;color:#7a8e8b;margin-top:3px;font-weight:650}
+    .badge{
+      position:absolute;top:8px;right:8px;padding:5px 7px;border-radius:999px;background:rgba(255,255,255,.92);
+      box-shadow:0 5px 12px rgba(20,75,69,.09);font-size:8px;font-weight:950;color:#386b65;z-index:5
+    }
+    .levelMiniProgress{height:5px;border-radius:999px;background:#e7f2ef;overflow:hidden;margin-top:9px}
+    .levelMiniProgress>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#14a391,#71d7c7)}
+    .levelFooter{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:8px;font-weight:850;color:#7c908d}
+    .levelArrow{font-size:13px;color:#158c80}
 
-/* ---------- GAME ---------- */
-#gameScreen{
-  min-height:100vh;padding:11px 12px 18px;
-  background:
-    radial-gradient(circle at 50% -10%,rgba(102,220,201,.26),transparent 35%),
-    linear-gradient(180deg,#eafaf7 0%,#c9eee7 100%)
-}
-.topbar{display:flex;align-items:center;gap:10px}
-.roundBtn{
-  width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.88);font-size:19px;color:var(--ink);
-  box-shadow:0 8px 20px rgba(25,93,85,.10);border:1px solid rgba(255,255,255,.9)
-}
-.titleWrap{flex:1;min-width:0}.gameTitle{font-size:17px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gameMeta{font-size:9.5px;color:var(--muted);margin-top:2px}
-.timerPill{
-  min-width:67px;padding:8px 10px;border-radius:15px;background:linear-gradient(145deg,#0a756b,#13998b);
-  color:white;text-align:center;font-weight:950;font-size:14px;box-shadow:0 8px 20px rgba(7,113,103,.22)
-}
-.progressRow{display:flex;justify-content:space-between;align-items:center;margin-top:11px;font-size:9px;color:var(--muted);font-weight:850}
-.progressShell{height:8px;background:rgba(255,255,255,.72);border-radius:999px;overflow:hidden;margin-top:5px}
-#progressBar{height:100%;width:0;background:linear-gradient(90deg,#0b8d80,#72dece);transition:width .18s ease;box-shadow:0 0 10px rgba(88,218,199,.65)}
-.boardCard{
-  margin-top:10px;background:rgba(255,255,255,.91);border-radius:29px;padding:9px;
-  box-shadow:0 18px 38px rgba(25,93,85,.13);overflow:hidden;border:1px solid rgba(255,255,255,.92)
-}
-#boardWrap{position:relative;width:100%;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;border-radius:22px;background:radial-gradient(circle,#fff,#edf9f6)}
-#board{width:100%;height:100%;display:grid;touch-action:none;padding:5px}
-.cell{position:relative;display:grid;place-items:center;border:1px solid rgba(65,101,96,.17);background:#fbfdfd;overflow:hidden;transition:background .12s ease,transform .11s ease,box-shadow .12s ease}
-.cell.active{cursor:pointer}.cell.blank{visibility:hidden}.cell.painted{border-color:rgba(255,255,255,.58)}.cell.hit{animation:cellPop .23s ease}.cell.softMiss{animation:softMiss .25s ease}
-@keyframes cellPop{50%{transform:scale(.86)}100%{transform:scale(1)}}@keyframes softMiss{50%{box-shadow:inset 0 0 0 2px rgba(18,143,130,.18)}}
-.cellNum{font-size:clamp(7px,2.05vw,12px);font-weight:950;color:rgba(50,88,83,.50);pointer-events:none}.painted .cellNum{display:none}
-.mandalaGlow{position:absolute;inset:8%;border-radius:50%;box-shadow:0 0 52px rgba(72,191,174,.15);pointer-events:none}
-.focusHint{text-align:center;font-size:10.5px;color:var(--muted);margin:9px 2px 7px;font-weight:650}
+    /* ---------- GAME ---------- */
+    #gameScreen{
+      min-height:100vh;padding:11px 12px 18px;
+      background:
+        radial-gradient(circle at 50% -10%,rgba(102,220,201,.26),transparent 35%),
+        linear-gradient(180deg,#eafaf7 0%,#c9eee7 100%)
+    }
+    .topbar{display:flex;align-items:center;gap:10px}
+    .roundBtn{
+      width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.88);font-size:19px;color:var(--ink);
+      box-shadow:0 8px 20px rgba(25,93,85,.10);border:1px solid rgba(255,255,255,.9)
+    }
+    .titleWrap{flex:1;min-width:0}.gameTitle{font-size:17px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gameMeta{font-size:9.5px;color:var(--muted);margin-top:2px}
+    .timerPill{
+      min-width:67px;padding:8px 10px;border-radius:15px;background:linear-gradient(145deg,#0a756b,#13998b);
+      color:white;text-align:center;font-weight:950;font-size:14px;box-shadow:0 8px 20px rgba(7,113,103,.22)
+    }
+    .progressRow{display:flex;justify-content:space-between;align-items:center;margin-top:11px;font-size:9px;color:var(--muted);font-weight:850}
+    .progressShell{height:8px;background:rgba(255,255,255,.72);border-radius:999px;overflow:hidden;margin-top:5px}
+    #progressBar{height:100%;width:0;background:linear-gradient(90deg,#0b8d80,#72dece);transition:width .18s ease;box-shadow:0 0 10px rgba(88,218,199,.65)}
+    .boardCard{
+      margin-top:10px;background:rgba(255,255,255,.91);border-radius:29px;padding:9px;
+      box-shadow:0 18px 38px rgba(25,93,85,.13);overflow:hidden;border:1px solid rgba(255,255,255,.92)
+    }
+    #boardWrap{position:relative;width:100%;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;border-radius:22px;background:radial-gradient(circle,#fff,#edf9f6)}
+    #board{width:100%;height:100%;display:grid;touch-action:none;padding:5px}
+    .cell{position:relative;display:grid;place-items:center;border:1px solid rgba(65,101,96,.17);background:#fbfdfd;overflow:hidden;transition:background .12s ease,transform .11s ease,box-shadow .12s ease}
+    .cell.active{cursor:pointer}.cell.blank{visibility:hidden}.cell.painted{border-color:rgba(255,255,255,.58)}.cell.hit{animation:cellPop .23s ease}.cell.softMiss{animation:softMiss .25s ease}
+    @keyframes cellPop{50%{transform:scale(.86)}100%{transform:scale(1)}}@keyframes softMiss{50%{box-shadow:inset 0 0 0 2px rgba(18,143,130,.18)}}
+    .cellNum{font-size:clamp(7px,2.05vw,12px);font-weight:950;color:rgba(50,88,83,.50);pointer-events:none}.painted .cellNum{display:none}
+    .mandalaGlow{position:absolute;inset:8%;border-radius:50%;box-shadow:0 0 52px rgba(72,191,174,.15);pointer-events:none}
+    .focusHint{text-align:center;font-size:10.5px;color:var(--muted);margin:9px 2px 7px;font-weight:650}
 
-/* palette */
-.paletteCard{
-  background:rgba(255,255,255,.92);border-radius:24px;padding:11px;box-shadow:0 12px 29px rgba(25,93,85,.10);
-  border:1px solid rgba(255,255,255,.92)
-}
-.paletteHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.paletteTitle{font-size:10px;font-weight:950;letter-spacing:.9px}.selectedText{font-size:9.5px;color:var(--muted);font-weight:700}
-#palette{display:grid;gap:8px}
-.colorChip{
-  height:48px;border:0;border-radius:16px;position:relative;overflow:hidden;color:#fff;font-size:11px;font-weight:950;
-  box-shadow:0 7px 14px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35);touch-action:none;transition:transform .12s ease,outline .12s ease
-}
-.colorChip::after{content:"";position:absolute;width:35px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);top:5px;left:12px;transform:rotate(-18deg)}
-.colorChip.selected{outline:3px solid rgba(18,78,72,.32);transform:translateY(-2px)}
-.colorChip .num{position:relative;z-index:2;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.92);color:#274d49;display:inline-grid;place-items:center;margin-right:5px}
-.actionRow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
-.secondaryBtn{height:43px;border:0;border-radius:15px;background:#e8f4f1;color:var(--ink);font-weight:850;font-size:10.5px}
-#paintGhost{position:fixed;width:48px;height:48px;margin-left:-24px;margin-top:-24px;border-radius:50%;border:4px solid rgba(255,255,255,.93);box-shadow:0 12px 28px rgba(0,0,0,.24);z-index:700;pointer-events:none;display:none}
-.spark{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:720;animation:spark .55s ease-out forwards}
-@keyframes spark{to{transform:translate(var(--x),var(--y)) scale(0);opacity:0}}
+    /* palette */
+    .paletteCard{
+      background:rgba(255,255,255,.92);border-radius:24px;padding:11px;box-shadow:0 12px 29px rgba(25,93,85,.10);
+      border:1px solid rgba(255,255,255,.92)
+    }
+    .paletteHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.paletteTitle{font-size:10px;font-weight:950;letter-spacing:.9px}.selectedText{font-size:9.5px;color:var(--muted);font-weight:700}
+    #palette{display:grid;gap:8px}
+    .colorChip{
+      height:48px;border:0;border-radius:16px;position:relative;overflow:hidden;color:#fff;font-size:11px;font-weight:950;
+      box-shadow:0 7px 14px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35);touch-action:none;transition:transform .12s ease,outline .12s ease
+    }
+    .colorChip::after{content:"";position:absolute;width:35px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);top:5px;left:12px;transform:rotate(-18deg)}
+    .colorChip.selected{outline:3px solid rgba(18,78,72,.32);transform:translateY(-2px)}
+    .colorChip .num{position:relative;z-index:2;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.92);color:#274d49;display:inline-grid;place-items:center;margin-right:5px}
+    .actionRow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+    .secondaryBtn{height:43px;border:0;border-radius:15px;background:#e8f4f1;color:var(--ink);font-weight:850;font-size:10.5px}
+    #paintGhost{position:fixed;width:48px;height:48px;margin-left:-24px;margin-top:-24px;border-radius:50%;border:4px solid rgba(255,255,255,.93);box-shadow:0 12px 28px rgba(0,0,0,.24);z-index:700;pointer-events:none;display:none}
+    .spark{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:720;animation:spark .55s ease-out forwards}
+    @keyframes spark{to{transform:translate(var(--x),var(--y)) scale(0);opacity:0}}
 
-/* overlays */
-.overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(circle at 50% 12%,rgba(213,255,247,.96),transparent 34%),linear-gradient(160deg,#50c4b4,#08766f)}
-.overlayCard{width:100%;max-width:380px;background:rgba(255,255,255,.97);border-radius:30px;padding:27px 22px;text-align:center;box-shadow:0 25px 70px rgba(0,0,0,.22)}
-.overlayIcon{font-size:56px}.overlayTitle{font-size:27px;font-weight:950;margin-top:10px}.overlayText{font-size:13px;color:var(--muted);line-height:1.55;margin-top:10px}
-.overlayBtn{width:100%;height:53px;margin-top:18px;border:0;border-radius:17px;background:linear-gradient(90deg,#128f82,#49bdae);color:white;font-weight:950;font-size:14px}
-.overlayAlt{width:100%;height:45px;margin-top:8px;border:0;border-radius:15px;background:#e9f5f2;color:var(--ink);font-weight:850}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:rgba(20,74,69,.94);color:white;padding:10px 15px;border-radius:999px;font-size:11px;z-index:1500;opacity:0;transition:.2s}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-height:760px){#boardWrap{max-height:390px}.colorChip{height:43px}.focusHint{margin:5px 2px}.boardCard{padding:6px}}
-</style>
+    /* overlays */
+    .overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(circle at 50% 12%,rgba(213,255,247,.96),transparent 34%),linear-gradient(160deg,#50c4b4,#08766f)}
+    .overlayCard{width:100%;max-width:380px;background:rgba(255,255,255,.97);border-radius:30px;padding:27px 22px;text-align:center;box-shadow:0 25px 70px rgba(0,0,0,.22)}
+    .overlayIcon{font-size:56px}.overlayTitle{font-size:27px;font-weight:950;margin-top:10px}.overlayText{font-size:13px;color:var(--muted);line-height:1.55;margin-top:10px}
+    .overlayBtn{width:100%;height:53px;margin-top:18px;border:0;border-radius:17px;background:linear-gradient(90deg,#128f82,#49bdae);color:white;font-weight:950;font-size:14px}
+    .overlayAlt{width:100%;height:45px;margin-top:8px;border:0;border-radius:15px;background:#e9f5f2;color:var(--ink);font-weight:850}
+    .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:rgba(20,74,69,.94);color:white;padding:10px 15px;border-radius:999px;font-size:11px;z-index:1500;opacity:0;transition:.2s}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-height:760px){#boardWrap{max-height:390px}.colorChip{height:43px}.focusHint{margin:5px 2px}.boardCard{padding:6px}}
+  </style>
 </head>
 <body>
 
@@ -312,611 +312,726 @@ button:active{transform:scale(.975)}
 <div id="toast" class="toast"></div>
 
 <script>
-const STORAGE_KEY = "mindmate_mandala_paint_v2";
-const SESSION_SECONDS = 120;
+  const STORAGE_KEY = "mindmate_mandala_paint_v2";
+  const SESSION_SECONDS = 120;
 
-const LEVELS = [
-  {level:1,name:"Lotus Bloom",icon:"🌸",grid:9,colors:4,cellsText:"Easy · 4 colors",design:"lotus"},
-  {level:2,name:"Ocean Harmony",icon:"🌊",grid:11,colors:4,cellsText:"Easy+ · 4 colors",design:"ocean"},
-  {level:3,name:"Leaf Garden",icon:"🍃",grid:13,colors:5,cellsText:"Medium · 5 colors",design:"leaf"},
-  {level:4,name:"Sun Spiral",icon:"☀️",grid:15,colors:5,cellsText:"Medium+ · 5 colors",design:"sun"},
-  {level:5,name:"Star Serenity",icon:"✨",grid:17,colors:6,cellsText:"Hard · 6 colors",design:"star"},
-  {level:6,name:"Crystal Calm",icon:"💎",grid:19,colors:6,cellsText:"Advanced · 6 colors",design:"crystal"}
-];
+  const LEVELS = [
+    {level:1,name:"Lotus Bloom",icon:"🌸",grid:9,colors:4,cellsText:"Easy · 4 colors",design:"lotus"},
+    {level:2,name:"Ocean Harmony",icon:"🌊",grid:11,colors:4,cellsText:"Easy+ · 4 colors",design:"ocean"},
+    {level:3,name:"Leaf Garden",icon:"🍃",grid:13,colors:5,cellsText:"Medium · 5 colors",design:"leaf"},
+    {level:4,name:"Sun Spiral",icon:"☀️",grid:15,colors:5,cellsText:"Medium+ · 5 colors",design:"sun"},
+    {level:5,name:"Star Serenity",icon:"✨",grid:17,colors:6,cellsText:"Hard · 6 colors",design:"star"},
+    {level:6,name:"Crystal Calm",icon:"💎",grid:19,colors:6,cellsText:"Advanced · 6 colors",design:"crystal"}
+  ];
 
-const COLORS = [
-  {name:"Aqua",value:"#55cfc0"},
-  {name:"Ocean",value:"#67a9e6"},
-  {name:"Lilac",value:"#a38cdd"},
-  {name:"Rose",value:"#e68aae"},
-  {name:"Sun",value:"#efc65e"},
-  {name:"Coral",value:"#ef9a70"}
-];
+  const COLORS = [
+    {name:"Aqua",value:"#55cfc0"},
+    {name:"Ocean",value:"#67a9e6"},
+    {name:"Lilac",value:"#a38cdd"},
+    {name:"Rose",value:"#e68aae"},
+    {name:"Sun",value:"#efc65e"},
+    {name:"Coral",value:"#ef9a70"}
+  ];
 
-let state = defaultState();
-let currentLevel = 1;
-let targetCells = [];
-let selectedColor = 0;
-let sessionLeft = SESSION_SECONDS;
-let sessionTimer = null;
-let painting = false;
-let dragColor = null;
-let lastPaintedThisStroke = new Set();
-let undoStack = [];
-let resultSent = false;
+  let state = defaultState();
+  let currentLevel = 1;
+  let targetCells = [];
+  let selectedColor = 0;
+  let sessionLeft = SESSION_SECONDS;
+  let sessionTimer = null;
+  let painting = false;
+  let dragColor = null;
+  let lastPaintedThisStroke = new Set();
+  let undoStack = [];
+  let resultSent = false;
 
-const homeScreen=document.getElementById("homeScreen");
-const gameScreen=document.getElementById("gameScreen");
-const levelGrid=document.getElementById("levelGrid");
-const continueIcon=document.getElementById("continueIcon");
-const continueLabel=document.getElementById("continueLabel");
-const continueName=document.getElementById("continueName");
-const continueProgress=document.getElementById("continueProgress");
-const continueBtn=document.getElementById("continueBtn");
-const continueMiniBar=document.getElementById("continueMiniBar");
-const gameTitle=document.getElementById("gameTitle");
-const gameMeta=document.getElementById("gameMeta");
-const timerEl=document.getElementById("timer");
-const progressText=document.getElementById("progressText");
-const cellText=document.getElementById("cellText");
-const progressBar=document.getElementById("progressBar");
-const board=document.getElementById("board");
-const palette=document.getElementById("palette");
-const selectedText=document.getElementById("selectedText");
-const paintGhost=document.getElementById("paintGhost");
-const sessionOverlay=document.getElementById("sessionOverlay");
-const sessionText=document.getElementById("sessionText");
-const levelOverlay=document.getElementById("levelOverlay");
-const levelText=document.getElementById("levelText");
-const nextLevelBtn=document.getElementById("nextLevelBtn");
-const toastEl=document.getElementById("toast");
+  /*
+   * Reward returned by Android for the most recently completed level.
+   * 10 = first completion
+   * 0  = already rewarded / replay
+   */
+  let lastCompletionPoints = 0;
 
-function defaultState(){
-  const levels={};
-  for(let i=1;i<=6;i++) levels[i]={painted:{},completed:false,bestPercent:0};
-  return {version:2,currentLevel:1,unlockedLevel:1,levels};
-}
+  const homeScreen=document.getElementById("homeScreen");
+  const gameScreen=document.getElementById("gameScreen");
+  const levelGrid=document.getElementById("levelGrid");
+  const continueIcon=document.getElementById("continueIcon");
+  const continueLabel=document.getElementById("continueLabel");
+  const continueName=document.getElementById("continueName");
+  const continueProgress=document.getElementById("continueProgress");
+  const continueBtn=document.getElementById("continueBtn");
+  const continueMiniBar=document.getElementById("continueMiniBar");
+  const gameTitle=document.getElementById("gameTitle");
+  const gameMeta=document.getElementById("gameMeta");
+  const timerEl=document.getElementById("timer");
+  const progressText=document.getElementById("progressText");
+  const cellText=document.getElementById("cellText");
+  const progressBar=document.getElementById("progressBar");
+  const board=document.getElementById("board");
+  const palette=document.getElementById("palette");
+  const selectedText=document.getElementById("selectedText");
+  const paintGhost=document.getElementById("paintGhost");
+  const sessionOverlay=document.getElementById("sessionOverlay");
+  const sessionText=document.getElementById("sessionText");
+  const levelOverlay=document.getElementById("levelOverlay");
+  const levelText=document.getElementById("levelText");
+  const nextLevelBtn=document.getElementById("nextLevelBtn");
+  const toastEl=document.getElementById("toast");
 
-function normalizeState(raw){
-  const base=defaultState();
-  try{
-    if(!raw||typeof raw!=="object") return base;
-    base.currentLevel=Math.min(6,Math.max(1,Number(raw.currentLevel)||1));
-    base.unlockedLevel=Math.min(6,Math.max(1,Number(raw.unlockedLevel)||1));
-    for(let i=1;i<=6;i++){
-      const src=raw.levels?.[i]||raw.levels?.[String(i)]||{};
-      base.levels[i]={
-        painted:(src.painted&&typeof src.painted==="object")?src.painted:{},
-        completed:!!src.completed,
-        bestPercent:Number(src.bestPercent)||0
-      };
-    }
-  }catch(e){}
-  return base;
-}
+  function defaultState(){
+    const levels={};
+    for(let i=1;i<=6;i++) levels[i]={painted:{},completed:false,bestPercent:0};
+    return {version:2,currentLevel:1,unlockedLevel:1,levels};
+  }
 
-function loadState(){
-  let loaded=null;
-
-  // Native SharedPreferences bridge (preferred once Android methods are added).
-  try{
-    if(typeof Android!=="undefined" && typeof Android.getMandalaProgress==="function"){
-      const nativeJson=Android.getMandalaProgress();
-      if(nativeJson) loaded=JSON.parse(nativeJson);
-    }
-  }catch(e){}
-
-  // WebView localStorage fallback means resume works immediately.
-  if(!loaded){
+  function normalizeState(raw){
+    const base=defaultState();
     try{
-      const local=localStorage.getItem(STORAGE_KEY);
-      if(local) loaded=JSON.parse(local);
+      if(!raw||typeof raw!=="object") return base;
+      base.currentLevel=Math.min(6,Math.max(1,Number(raw.currentLevel)||1));
+      base.unlockedLevel=Math.min(6,Math.max(1,Number(raw.unlockedLevel)||1));
+      for(let i=1;i<=6;i++){
+        const src=raw.levels?.[i]||raw.levels?.[String(i)]||{};
+        base.levels[i]={
+          painted:(src.painted&&typeof src.painted==="object")?src.painted:{},
+          completed:!!src.completed,
+          bestPercent:Number(src.bestPercent)||0
+        };
+      }
+    }catch(e){}
+    return base;
+  }
+
+  function loadState(){
+    let loaded=null;
+
+    // Native SharedPreferences bridge (preferred once Android methods are added).
+    try{
+      if(typeof Android!=="undefined" && typeof Android.getMandalaProgress==="function"){
+        const nativeJson=Android.getMandalaProgress();
+        if(nativeJson) loaded=JSON.parse(nativeJson);
+      }
+    }catch(e){}
+
+    // WebView localStorage fallback means resume works immediately.
+    if(!loaded){
+      try{
+        const local=localStorage.getItem(STORAGE_KEY);
+        if(local) loaded=JSON.parse(local);
+      }catch(e){}
+    }
+
+    state=normalizeState(loaded);
+    currentLevel=state.currentLevel;
+  }
+
+  function saveState(){
+    state.currentLevel=currentLevel;
+    const json=JSON.stringify(state);
+
+    try{localStorage.setItem(STORAGE_KEY,json)}catch(e){}
+
+    // Optional native autosave hook.
+    try{
+      if(typeof Android!=="undefined" && typeof Android.saveMandalaProgress==="function"){
+        Android.saveMandalaProgress(json);
+      }
     }catch(e){}
   }
 
-  state=normalizeState(loaded);
-  currentLevel=state.currentLevel;
-}
+  function levelConfig(level){return LEVELS[level-1]}
 
-function saveState(){
-  state.currentLevel=currentLevel;
-  const json=JSON.stringify(state);
-
-  try{localStorage.setItem(STORAGE_KEY,json)}catch(e){}
-
-  // Optional native autosave hook.
-  try{
-    if(typeof Android!=="undefined" && typeof Android.saveMandalaProgress==="function"){
-      Android.saveMandalaProgress(json);
+  function maskFor(level,x,y){
+    const r=Math.sqrt(x*x+y*y);
+    const theta=Math.atan2(y,x);
+    if(level===1){
+      const edge=.77+.13*Math.cos(8*theta);
+      return r<edge && r>.08;
     }
-  }catch(e){}
-}
-
-function levelConfig(level){return LEVELS[level-1]}
-
-function maskFor(level,x,y){
-  const r=Math.sqrt(x*x+y*y);
-  const theta=Math.atan2(y,x);
-  if(level===1){
-    const edge=.77+.13*Math.cos(8*theta);
-    return r<edge && r>.08;
-  }
-  if(level===2){
-    const edge=.80+.08*Math.sin(6*theta)+.035*Math.cos(12*theta);
-    return r<edge && r>.07;
-  }
-  if(level===3){
-    const edge=.76+.16*Math.abs(Math.cos(4*theta));
-    return r<edge && r>.06;
-  }
-  if(level===4){
-    const edge=.76+.16*Math.pow(Math.abs(Math.cos(6*theta)),3);
-    return r<edge && r>.055;
-  }
-  if(level===5){
-    const edge=.70+.22*Math.pow(Math.abs(Math.cos(5*theta)),4);
-    return r<edge && r>.05;
-  }
-  // Crystal Calm: rounded diamond / faceted edge.
-  const diamond=Math.abs(x)+Math.abs(y);
-  return diamond<1.14 && r<.95 && r>.045;
-}
-
-function colorIndexFor(level,x,y,count){
-  const r=Math.sqrt(x*x+y*y);
-  let theta=Math.atan2(y,x);
-  if(theta<0) theta+=Math.PI*2;
-  const ring=Math.floor(r*6.2);
-  const sectors=[8,10,8,12,10,12][level-1];
-  const sector=Math.floor(theta/(Math.PI*2/sectors));
-  const mirrored=Math.min(sector,sectors-sector);
-  const designShift=[0,1,2,3,1,4][level-1];
-  return Math.abs(ring*2+mirrored+designShift)%count;
-}
-
-function generateCells(level){
-  const cfg=levelConfig(level),n=cfg.grid,cells=[];
-  for(let row=0;row<n;row++){
-    for(let col=0;col<n;col++){
-      const x=(col-(n-1)/2)/((n-1)/2);
-      const y=(row-(n-1)/2)/((n-1)/2);
-      if(maskFor(level,x,y)){
-        const color=colorIndexFor(level,x,y,cfg.colors);
-        cells.push({row,col,key:`${row}_${col}`,color});
-      }
+    if(level===2){
+      const edge=.80+.08*Math.sin(6*theta)+.035*Math.cos(12*theta);
+      return r<edge && r>.07;
     }
-  }
-  return cells;
-}
-
-function getLevelProgress(level){
-  const cells=generateCells(level);
-  const painted=state.levels[level].painted||{};
-  const done=cells.filter(c=>painted[c.key]!==undefined).length;
-  const percent=cells.length?Math.round(done/cells.length*100):0;
-  return {done,total:cells.length,percent};
-}
-
-function renderHome(){
-  currentLevel=Math.min(state.currentLevel,state.unlockedLevel);
-  const cfg=levelConfig(currentLevel),p=getLevelProgress(currentLevel);
-
-  continueIcon.textContent=cfg.icon;
-  continueName.textContent=`Level ${currentLevel} · ${cfg.name}`;
-
-  if(state.levels[currentLevel].completed){
-    continueLabel.textContent="READY FOR YOUR NEXT MANDALA";
-    continueProgress.textContent=currentLevel<6?"Previous level completed · next challenge ready":"All 6 levels completed ✨";
-    continueBtn.textContent=currentLevel<6?`Start Level ${Math.min(6,currentLevel+1)}`:"Replay Level 6";
-    continueMiniBar.style.width="100%";
-  }else if(p.done>0){
-    continueLabel.textContent="CONTINUE YOUR CURRENT LEVEL";
-    continueProgress.textContent=`${p.percent}% complete · ${p.done} of ${p.total} cells`;
-    continueBtn.textContent=`Continue Level ${currentLevel}`;
-    continueMiniBar.style.width=p.percent+"%";
-  }else{
-    continueLabel.textContent="YOUR CURRENT LEVEL";
-    continueProgress.textContent="Ready for a gentle 2-minute session";
-    continueBtn.textContent=`Start Level ${currentLevel}`;
-    continueMiniBar.style.width="0%";
+    if(level===3){
+      const edge=.76+.16*Math.abs(Math.cos(4*theta));
+      return r<edge && r>.06;
+    }
+    if(level===4){
+      const edge=.76+.16*Math.pow(Math.abs(Math.cos(6*theta)),3);
+      return r<edge && r>.055;
+    }
+    if(level===5){
+      const edge=.70+.22*Math.pow(Math.abs(Math.cos(5*theta)),4);
+      return r<edge && r>.05;
+    }
+    // Crystal Calm: rounded diamond / faceted edge.
+    const diamond=Math.abs(x)+Math.abs(y);
+    return diamond<1.14 && r<.95 && r>.045;
   }
 
-  levelGrid.innerHTML="";
-  LEVELS.forEach(cfg=>{
-    const unlocked=cfg.level<=state.unlockedLevel;
-    const p=getLevelProgress(cfg.level);
-    const completed=state.levels[cfg.level].completed;
+  function colorIndexFor(level,x,y,count){
+    const r=Math.sqrt(x*x+y*y);
+    let theta=Math.atan2(y,x);
+    if(theta<0) theta+=Math.PI*2;
+    const ring=Math.floor(r*6.2);
+    const sectors=[8,10,8,12,10,12][level-1];
+    const sector=Math.floor(theta/(Math.PI*2/sectors));
+    const mirrored=Math.min(sector,sectors-sector);
+    const designShift=[0,1,2,3,1,4][level-1];
+    return Math.abs(ring*2+mirrored+designShift)%count;
+  }
 
-    const card=document.createElement("button");
-    card.className="levelCard"+(!unlocked?" locked":"")+(cfg.level===currentLevel?" current":"");
-    card.disabled=!unlocked;
-    card.onclick=()=>openLevel(cfg.level);
-
-    let badge="";
-    if(completed) badge="✓ COMPLETE";
-    else if(!unlocked) badge="🔒 LOCKED";
-    else if(p.done>0) badge=`${p.percent}%`;
-
-    card.innerHTML=`
-      <div class="levelArt"><div class="levelEmoji">${cfg.icon}</div></div>
-      <div class="levelNo">LEVEL ${cfg.level}</div>
-      <div class="levelName">${cfg.name}</div>
-      <div class="levelMeta">${cfg.cellsText}</div>
-      <div class="levelMiniProgress"><span style="width:${completed?100:p.percent}%"></span></div>
-      <div class="levelFooter">
-        <span>${completed?"Completed":(!unlocked?"Locked":(p.done>0?`${p.percent}% colored`:"Ready"))}</span>
-        <span class="levelArrow">${unlocked?"→":"🔒"}</span>
-      </div>
-      ${badge?`<div class="badge">${badge}</div>`:""}
-    `;
-    levelGrid.appendChild(card);
-  });
-}
-
-function continueCurrent(){
-  let level=state.currentLevel;
-  if(state.levels[level].completed && level<6) level=Math.min(6,level+1);
-  openLevel(level);
-}
-
-function openLevel(level){
-  if(level>state.unlockedLevel) return;
-  currentLevel=level;
-  state.currentLevel=level;
-  saveState();
-
-  targetCells=generateCells(level);
-  selectedColor=0;
-  undoStack=[];
-  resultSent=false;
-  sessionLeft=SESSION_SECONDS;
-
-  const cfg=levelConfig(level);
-  gameTitle.textContent=`Level ${level} · ${cfg.name}`;
-  gameMeta.textContent=`${cfg.cellsText} · progress saves automatically`;
-
-  buildBoard();
-  buildPalette();
-  updateProgress();
-  updateTimer();
-
-  homeScreen.classList.add("hidden");
-  gameScreen.classList.remove("hidden");
-  sessionOverlay.classList.add("hidden");
-  levelOverlay.classList.add("hidden");
-
-  startSessionTimer();
-  window.scrollTo(0,0);
-}
-
-function buildBoard(){
-  const cfg=levelConfig(currentLevel),n=cfg.grid;
-  board.innerHTML="";
-  board.style.gridTemplateColumns=`repeat(${n},1fr)`;
-  board.style.gridTemplateRows=`repeat(${n},1fr)`;
-  board.style.gap=n>=17?"1px":n>=13?"1.5px":"2px";
-
-  const lookup={};
-  targetCells.forEach(c=>lookup[c.key]=c);
-  const painted=state.levels[currentLevel].painted||{};
-
-  for(let row=0;row<n;row++){
-    for(let col=0;col<n;col++){
-      const key=`${row}_${col}`,data=lookup[key];
-      const cell=document.createElement("div");
-
-      if(!data){
-        cell.className="cell blank";
-      }else{
-        cell.className="cell active";
-        cell.dataset.key=key;
-        cell.dataset.color=String(data.color);
-
-        const num=document.createElement("span");
-        num.className="cellNum";
-        num.textContent=String(data.color+1);
-        cell.appendChild(num);
-
-        if(painted[key]!==undefined){
-          cell.classList.add("painted");
-          cell.style.background=COLORS[Number(painted[key])].value;
+  function generateCells(level){
+    const cfg=levelConfig(level),n=cfg.grid,cells=[];
+    for(let row=0;row<n;row++){
+      for(let col=0;col<n;col++){
+        const x=(col-(n-1)/2)/((n-1)/2);
+        const y=(row-(n-1)/2)/((n-1)/2);
+        if(maskFor(level,x,y)){
+          const color=colorIndexFor(level,x,y,cfg.colors);
+          cells.push({row,col,key:`${row}_${col}`,color});
         }
       }
-      board.appendChild(cell);
     }
+    return cells;
   }
 
-  board.onpointerdown=startBoardPaint;
-}
-
-function buildPalette(){
-  const cfg=levelConfig(currentLevel);
-  palette.innerHTML="";
-  palette.style.gridTemplateColumns=`repeat(${cfg.colors},1fr)`;
-
-  for(let i=0;i<cfg.colors;i++){
-    const c=COLORS[i],btn=document.createElement("button");
-    btn.className="colorChip"+(i===selectedColor?" selected":"");
-    btn.style.background=c.value;
-    btn.dataset.index=String(i);
-    btn.innerHTML=`<span class="num">${i+1}</span>${c.name}`;
-    btn.onclick=()=>selectColor(i);
-    btn.addEventListener("pointerdown",e=>startColorGhost(e,i));
-    palette.appendChild(btn);
-  }
-  selectedText.textContent=`Color ${selectedColor+1} · ${COLORS[selectedColor].name}`;
-}
-
-function selectColor(index){
-  selectedColor=index;
-  document.querySelectorAll(".colorChip").forEach(b=>b.classList.toggle("selected",Number(b.dataset.index)===index));
-  selectedText.textContent=`Color ${index+1} · ${COLORS[index].name}`;
-}
-
-function startColorGhost(e,index){
-  // Long/drag from palette is supported; a normal tap still selects.
-  selectColor(index);
-  dragColor=index;
-  paintGhost.style.background=COLORS[index].value;
-  paintGhost.style.display="block";
-  moveGhost(e.clientX,e.clientY);
-
-  const move=ev=>{ev.preventDefault();moveGhost(ev.clientX,ev.clientY)};
-  const up=ev=>{
-    const target=cellAt(ev.clientX,ev.clientY);
-    if(target) tryPaintCell(target,index,true);
-    paintGhost.style.display="none";
-    dragColor=null;
-    window.removeEventListener("pointermove",move);
-  };
-  window.addEventListener("pointermove",move,{passive:false});
-  window.addEventListener("pointerup",up,{passive:false,once:true});
-  window.addEventListener("pointercancel",up,{passive:false,once:true});
-}
-
-function moveGhost(x,y){paintGhost.style.left=x+"px";paintGhost.style.top=y+"px"}
-
-function startBoardPaint(e){
-  const cell=e.target.closest?.(".cell.active");
-  if(!cell) return;
-  e.preventDefault();
-  painting=true;
-  lastPaintedThisStroke=new Set();
-  tryPaintCell(cell,selectedColor,false);
-
-  const move=ev=>{
-    if(!painting) return;
-    ev.preventDefault();
-    const c=cellAt(ev.clientX,ev.clientY);
-    if(c) tryPaintCell(c,selectedColor,false);
-  };
-  const up=()=>{
-    painting=false;
-    window.removeEventListener("pointermove",move);
-  };
-  window.addEventListener("pointermove",move,{passive:false});
-  window.addEventListener("pointerup",up,{passive:false,once:true});
-  window.addEventListener("pointercancel",up,{passive:false,once:true});
-}
-
-function cellAt(x,y){
-  const wasVisible = paintGhost.style.display !== "none";
-  paintGhost.style.display="none";
-  const el=document.elementFromPoint(x,y);
-  if(wasVisible) paintGhost.style.display="block";
-  return el?.closest?.(".cell.active")||null;
-}
-
-function tryPaintCell(cell,colorIndex,fromDrop){
-  if(!cell) return;
-  const key=cell.dataset.key;
-  if(lastPaintedThisStroke.has(key) && !fromDrop) return;
-  lastPaintedThisStroke.add(key);
-
-  const needed=Number(cell.dataset.color);
-  const painted=state.levels[currentLevel].painted;
-
-  if(needed!==colorIndex){
-    cell.classList.remove("softMiss");
-    void cell.offsetWidth;
-    cell.classList.add("softMiss");
-    return;
+  function getLevelProgress(level){
+    const cells=generateCells(level);
+    const painted=state.levels[level].painted||{};
+    const done=cells.filter(c=>painted[c.key]!==undefined).length;
+    const percent=cells.length?Math.round(done/cells.length*100):0;
+    return {done,total:cells.length,percent};
   }
 
-  if(painted[key]!==undefined) return;
+  function renderHome(){
+    currentLevel=Math.min(state.currentLevel,state.unlockedLevel);
+    const cfg=levelConfig(currentLevel),p=getLevelProgress(currentLevel);
 
-  undoStack.push(key);
-  painted[key]=colorIndex;
+    continueIcon.textContent=cfg.icon;
+    continueName.textContent=`Level ${currentLevel} · ${cfg.name}`;
 
-  cell.style.background=COLORS[colorIndex].value;
-  cell.classList.add("painted","hit");
-  setTimeout(()=>cell.classList.remove("hit"),240);
+    if(state.levels[currentLevel].completed){
+      continueLabel.textContent="READY FOR YOUR NEXT MANDALA";
+      continueProgress.textContent=currentLevel<6?"Previous level completed · next challenge ready":"All 6 levels completed ✨";
+      continueBtn.textContent=currentLevel<6?`Start Level ${Math.min(6,currentLevel+1)}`:"Replay Level 6";
+      continueMiniBar.style.width="100%";
+    }else if(p.done>0){
+      continueLabel.textContent="CONTINUE YOUR CURRENT LEVEL";
+      continueProgress.textContent=`${p.percent}% complete · ${p.done} of ${p.total} cells`;
+      continueBtn.textContent=`Continue Level ${currentLevel}`;
+      continueMiniBar.style.width=p.percent+"%";
+    }else{
+      continueLabel.textContent="YOUR CURRENT LEVEL";
+      continueProgress.textContent="Ready for a gentle 2-minute session";
+      continueBtn.textContent=`Start Level ${currentLevel}`;
+      continueMiniBar.style.width="0%";
+    }
 
-  const r=cell.getBoundingClientRect();
-  sparkle(r.left+r.width/2,r.top+r.height/2,COLORS[colorIndex].value);
+    levelGrid.innerHTML="";
+    LEVELS.forEach(cfg=>{
+      const unlocked=cfg.level<=state.unlockedLevel;
+      const p=getLevelProgress(cfg.level);
+      const completed=state.levels[cfg.level].completed;
 
-  if(navigator.vibrate) navigator.vibrate(10);
+      const card=document.createElement("button");
+      card.className="levelCard"+(!unlocked?" locked":"")+(cfg.level===currentLevel?" current":"");
+      card.disabled=!unlocked;
+      card.onclick=()=>openLevel(cfg.level);
 
-  updateProgress();
-  saveState();
+      let badge="";
+      if(completed) badge="✓ COMPLETE";
+      else if(!unlocked) badge="🔒 LOCKED";
+      else if(p.done>0) badge=`${p.percent}%`;
 
-  const p=getLevelProgress(currentLevel);
-  if(p.done===p.total){
-    completeLevel();
+      card.innerHTML=`
+        <div class="levelArt"><div class="levelEmoji">${cfg.icon}</div></div>
+        <div class="levelNo">LEVEL ${cfg.level}</div>
+        <div class="levelName">${cfg.name}</div>
+        <div class="levelMeta">${cfg.cellsText}</div>
+        <div class="levelMiniProgress"><span style="width:${completed?100:p.percent}%"></span></div>
+        <div class="levelFooter">
+          <span>${completed?"Completed":(!unlocked?"Locked":(p.done>0?`${p.percent}% colored`:"Ready"))}</span>
+          <span class="levelArrow">${unlocked?"→":"🔒"}</span>
+        </div>
+        ${badge?`<div class="badge">${badge}</div>`:""}
+      `;
+      levelGrid.appendChild(card);
+    });
   }
-}
 
-function undoLast(){
-  const key=undoStack.pop();
-  if(!key) return;
-
-  delete state.levels[currentLevel].painted[key];
-  const cell=board.querySelector(`[data-key="${key}"]`);
-  if(cell){
-    cell.style.background="#fbfdfd";
-    cell.classList.remove("painted");
+  function continueCurrent(){
+    let level=state.currentLevel;
+    if(state.levels[level].completed && level<6) level=Math.min(6,level+1);
+    openLevel(level);
   }
-  updateProgress();
-  saveState();
-}
 
-function updateProgress(){
-  const p=getLevelProgress(currentLevel);
-  progressText.textContent=`${p.percent}% colored`;
-  cellText.textContent=`${p.done} / ${p.total}`;
-  progressBar.style.width=p.percent+"%";
+  function openLevel(level){
+    if(level>state.unlockedLevel) return;
+    currentLevel=level;
+    state.currentLevel=level;
+    saveState();
 
-  state.levels[currentLevel].bestPercent=Math.max(state.levels[currentLevel].bestPercent||0,p.percent);
-}
+    targetCells=generateCells(level);
+    selectedColor=0;
+    undoStack=[];
+    resultSent=false;
+    lastCompletionPoints=0;
+    sessionLeft=SESSION_SECONDS;
 
-function startSessionTimer(){
-  clearInterval(sessionTimer);
-  sessionTimer=setInterval(()=>{
-    sessionLeft--;
+    const cfg=levelConfig(level);
+    gameTitle.textContent=`Level ${level} · ${cfg.name}`;
+    gameMeta.textContent=`${cfg.cellsText} · progress saves automatically`;
+
+    buildBoard();
+    buildPalette();
+    updateProgress();
     updateTimer();
-    if(sessionLeft<=0){
-      clearInterval(sessionTimer);
-      saveState();
-      showSessionComplete();
-    }
-  },1000);
-}
 
-function updateTimer(){
-  const m=Math.floor(sessionLeft/60),s=sessionLeft%60;
-  timerEl.textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-}
+    homeScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    sessionOverlay.classList.add("hidden");
+    levelOverlay.classList.add("hidden");
 
-function showSessionComplete(){
-  const p=getLevelProgress(currentLevel);
-  sessionText.innerHTML=`You colored <strong>${p.percent}%</strong> of Level ${currentLevel} · ${levelConfig(currentLevel).name}.<br><br>Your exact progress has been saved. You can continue from here next time.`;
-  sessionOverlay.classList.remove("hidden");
-}
-
-function saveAndPause(){
-  clearInterval(sessionTimer);
-  saveState();
-  const p=getLevelProgress(currentLevel);
-  sessionText.innerHTML=`Progress saved at <strong>${p.percent}%</strong>.<br><br>Next time Mandala Paint Flow opens, you can continue this same level.`;
-  sessionOverlay.classList.remove("hidden");
-}
-
-function startAnotherSession(){
-  sessionOverlay.classList.add("hidden");
-  sessionLeft=SESSION_SECONDS;
-  updateTimer();
-  startSessionTimer();
-}
-
-function completeLevel(){
-  clearInterval(sessionTimer);
-
-  const lvl=state.levels[currentLevel];
-  lvl.completed=true;
-  lvl.bestPercent=100;
-
-  if(currentLevel<6){
-    state.unlockedLevel=Math.max(state.unlockedLevel,currentLevel+1);
-    state.currentLevel=currentLevel+1;
-  }else{
-    state.currentLevel=6;
+    startSessionTimer();
+    window.scrollTo(0,0);
   }
 
-  saveState();
+  function buildBoard(){
+    const cfg=levelConfig(currentLevel),n=cfg.grid;
+    board.innerHTML="";
+    board.style.gridTemplateColumns=`repeat(${n},1fr)`;
+    board.style.gridTemplateRows=`repeat(${n},1fr)`;
+    board.style.gap=n>=17?"1px":n>=13?"1.5px":"2px";
 
-  const cfg=levelConfig(currentLevel);
-  levelText.innerHTML=`You completed <strong>Level ${currentLevel} · ${cfg.name}</strong>.<br><br>+10 MindPoints<br>${currentLevel<6?`Level ${currentLevel+1} is now unlocked 🔓`:"You completed all 6 Mandala levels ✨"}`;
-  nextLevelBtn.style.display=currentLevel<6?"block":"none";
-  levelOverlay.classList.remove("hidden");
-}
+    const lookup={};
+    targetCells.forEach(c=>lookup[c.key]=c);
+    const painted=state.levels[currentLevel].painted||{};
 
-function startNextLevel(){
-  levelOverlay.classList.add("hidden");
-  openLevel(Math.min(6,currentLevel+1));
-}
+    for(let row=0;row<n;row++){
+      for(let col=0;col<n;col++){
+        const key=`${row}_${col}`,data=lookup[key];
+        const cell=document.createElement("div");
 
-function returnPausedToMindMate(){
-  const p=getLevelProgress(currentLevel);
-  notifySessionEnd("PAUSED",0,p.percent);
-}
+        if(!data){
+          cell.className="cell blank";
+        }else{
+          cell.className="cell active";
+          cell.dataset.key=key;
+          cell.dataset.color=String(data.color);
 
-function returnCompletedToMindMate(){
-  notifySessionEnd("COMPLETED",10,100);
-}
+          const num=document.createElement("span");
+          num.className="cellNum";
+          num.textContent=String(data.color+1);
+          cell.appendChild(num);
 
-function notifySessionEnd(status,points,percent){
-  if(resultSent) return;
-  resultSent=true;
-  saveState();
+          if(painted[key]!==undefined){
+            cell.classList.add("painted");
+            cell.style.background=COLORS[Number(painted[key])].value;
+          }
+        }
+        board.appendChild(cell);
+      }
+    }
 
-  // Preferred bridge: lets Android return to Chat with 0 points for pause,
-  // or +10 only for a completed level.
-  try{
-    if(typeof Android!=="undefined" && typeof Android.mandalaSessionEnded==="function"){
-      Android.mandalaSessionEnded(
-        status,
-        String(currentLevel),
-        String(percent),
-        String(SESSION_SECONDS),
-        String(points)
-      );
+    board.onpointerdown=startBoardPaint;
+  }
+
+  function buildPalette(){
+    const cfg=levelConfig(currentLevel);
+    palette.innerHTML="";
+    palette.style.gridTemplateColumns=`repeat(${cfg.colors},1fr)`;
+
+    for(let i=0;i<cfg.colors;i++){
+      const c=COLORS[i],btn=document.createElement("button");
+      btn.className="colorChip"+(i===selectedColor?" selected":"");
+      btn.style.background=c.value;
+      btn.dataset.index=String(i);
+      btn.innerHTML=`<span class="num">${i+1}</span>${c.name}`;
+      btn.onclick=()=>selectColor(i);
+      btn.addEventListener("pointerdown",e=>startColorGhost(e,i));
+      palette.appendChild(btn);
+    }
+    selectedText.textContent=`Color ${selectedColor+1} · ${COLORS[selectedColor].name}`;
+  }
+
+  function selectColor(index){
+    selectedColor=index;
+    document.querySelectorAll(".colorChip").forEach(b=>b.classList.toggle("selected",Number(b.dataset.index)===index));
+    selectedText.textContent=`Color ${index+1} · ${COLORS[index].name}`;
+  }
+
+  function startColorGhost(e,index){
+    // Long/drag from palette is supported; a normal tap still selects.
+    selectColor(index);
+    dragColor=index;
+    paintGhost.style.background=COLORS[index].value;
+    paintGhost.style.display="block";
+    moveGhost(e.clientX,e.clientY);
+
+    const move=ev=>{ev.preventDefault();moveGhost(ev.clientX,ev.clientY)};
+    const up=ev=>{
+      const target=cellAt(ev.clientX,ev.clientY);
+      if(target) tryPaintCell(target,index,true);
+      paintGhost.style.display="none";
+      dragColor=null;
+      window.removeEventListener("pointermove",move);
+    };
+    window.addEventListener("pointermove",move,{passive:false});
+    window.addEventListener("pointerup",up,{passive:false,once:true});
+    window.addEventListener("pointercancel",up,{passive:false,once:true});
+  }
+
+  function moveGhost(x,y){paintGhost.style.left=x+"px";paintGhost.style.top=y+"px"}
+
+  function startBoardPaint(e){
+    const cell=e.target.closest?.(".cell.active");
+    if(!cell) return;
+    e.preventDefault();
+    painting=true;
+    lastPaintedThisStroke=new Set();
+    tryPaintCell(cell,selectedColor,false);
+
+    const move=ev=>{
+      if(!painting) return;
+      ev.preventDefault();
+      const c=cellAt(ev.clientX,ev.clientY);
+      if(c) tryPaintCell(c,selectedColor,false);
+    };
+    const up=()=>{
+      painting=false;
+      window.removeEventListener("pointermove",move);
+    };
+    window.addEventListener("pointermove",move,{passive:false});
+    window.addEventListener("pointerup",up,{passive:false,once:true});
+    window.addEventListener("pointercancel",up,{passive:false,once:true});
+  }
+
+  function cellAt(x,y){
+    const wasVisible = paintGhost.style.display !== "none";
+    paintGhost.style.display="none";
+    const el=document.elementFromPoint(x,y);
+    if(wasVisible) paintGhost.style.display="block";
+    return el?.closest?.(".cell.active")||null;
+  }
+
+  function tryPaintCell(cell,colorIndex,fromDrop){
+    if(!cell) return;
+    const key=cell.dataset.key;
+    if(lastPaintedThisStroke.has(key) && !fromDrop) return;
+    lastPaintedThisStroke.add(key);
+
+    const needed=Number(cell.dataset.color);
+    const painted=state.levels[currentLevel].painted;
+
+    if(needed!==colorIndex){
+      cell.classList.remove("softMiss");
+      void cell.offsetWidth;
+      cell.classList.add("softMiss");
       return;
     }
-  }catch(e){}
 
-  // Fallback for current GameWebViewActivity:
-  // Only completed levels call gameFinished, avoiding +10 for an incomplete session.
-  if(status==="COMPLETED"){
+    if(painted[key]!==undefined) return;
+
+    undoStack.push(key);
+    painted[key]=colorIndex;
+
+    cell.style.background=COLORS[colorIndex].value;
+    cell.classList.add("painted","hit");
+    setTimeout(()=>cell.classList.remove("hit"),240);
+
+    const r=cell.getBoundingClientRect();
+    sparkle(r.left+r.width/2,r.top+r.height/2,COLORS[colorIndex].value);
+
+    if(navigator.vibrate) navigator.vibrate(10);
+
+    updateProgress();
+    saveState();
+
+    const p=getLevelProgress(currentLevel);
+    if(p.done===p.total){
+      completeLevel();
+    }
+  }
+
+  function undoLast(){
+    const key=undoStack.pop();
+    if(!key) return;
+
+    delete state.levels[currentLevel].painted[key];
+    const cell=board.querySelector(`[data-key="${key}"]`);
+    if(cell){
+      cell.style.background="#fbfdfd";
+      cell.classList.remove("painted");
+    }
+    updateProgress();
+    saveState();
+  }
+
+  function updateProgress(){
+    const p=getLevelProgress(currentLevel);
+    progressText.textContent=`${p.percent}% colored`;
+    cellText.textContent=`${p.done} / ${p.total}`;
+    progressBar.style.width=p.percent+"%";
+
+    state.levels[currentLevel].bestPercent=Math.max(state.levels[currentLevel].bestPercent||0,p.percent);
+  }
+
+  function startSessionTimer(){
+    clearInterval(sessionTimer);
+    sessionTimer=setInterval(()=>{
+      sessionLeft--;
+      updateTimer();
+      if(sessionLeft<=0){
+        clearInterval(sessionTimer);
+        saveState();
+        showSessionComplete();
+      }
+    },1000);
+  }
+
+  function updateTimer(){
+    const m=Math.floor(sessionLeft/60),s=sessionLeft%60;
+    timerEl.textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }
+
+  function showSessionComplete(){
+    const p=getLevelProgress(currentLevel);
+    sessionText.innerHTML=`You colored <strong>${p.percent}%</strong> of Level ${currentLevel} · ${levelConfig(currentLevel).name}.<br><br>Your exact progress has been saved. You can continue from here next time.`;
+    sessionOverlay.classList.remove("hidden");
+  }
+
+  function saveAndPause(){
+    clearInterval(sessionTimer);
+    saveState();
+    const p=getLevelProgress(currentLevel);
+    sessionText.innerHTML=`Progress saved at <strong>${p.percent}%</strong>.<br><br>Next time Mandala Paint Flow opens, you can continue this same level.`;
+    sessionOverlay.classList.remove("hidden");
+  }
+
+  function startAnotherSession(){
+    sessionOverlay.classList.add("hidden");
+    sessionLeft=SESSION_SECONDS;
+    updateTimer();
+    startSessionTimer();
+  }
+
+  function completeLevel(){
+    clearInterval(sessionTimer);
+
+    const completedLevel=currentLevel;
+    const cfg=levelConfig(completedLevel);
+
+    /*
+     * Actual time spent in the current 120-second session.
+     */
+    const elapsedSeconds=
+      Math.max(
+        1,
+        SESSION_SECONDS-sessionLeft
+      );
+
+    const lvl=state.levels[completedLevel];
+    lvl.completed=true;
+    lvl.bestPercent=100;
+
+    if(completedLevel<6){
+      state.unlockedLevel=
+        Math.max(
+          state.unlockedLevel,
+          completedLevel+1
+        );
+
+      state.currentLevel=
+        completedLevel+1;
+    }else{
+      state.currentLevel=6;
+    }
+
+    /*
+     * Save coloring and next-level unlock first.
+     */
+    saveState();
+
+    /*
+     * PRIORITY #2 FIX:
+     * Award +10 immediately when this level reaches 100%.
+     * Therefore tapping "Next Level" cannot lose the reward.
+     */
+    lastCompletionPoints=0;
+
     try{
-      if(typeof Android!=="undefined" && typeof Android.gameFinished==="function"){
-        Android.gameFinished(
-          "mandala_paint_level_"+String(currentLevel),
+      if(
+        typeof Android!=="undefined" &&
+        typeof Android.mandalaLevelCompleted==="function"
+      ){
+        const awarded=
+          Android.mandalaLevelCompleted(
+            String(completedLevel),
+            String(elapsedSeconds)
+          );
+
+        const parsed=Number(awarded);
+
+        lastCompletionPoints=
+          Number.isFinite(parsed)
+            ? parsed
+            : 0;
+      }
+    }catch(e){
+      console.log(
+        "Mandala level reward bridge error:",
+        e
+      );
+    }
+
+    const rewardLine=
+      lastCompletionPoints>0
+        ? `+${lastCompletionPoints} MindPoints`
+        : `Reward already collected`;
+
+    levelText.innerHTML=
+      `You completed <strong>Level ${completedLevel} · ${cfg.name}</strong>.` +
+      `<br><br><strong>${rewardLine}</strong><br>` +
+      `${completedLevel<6
+          ? `Level ${completedLevel+1} is now unlocked 🔓`
+          : "You completed all 6 Mandala levels ✨"}`;
+
+    nextLevelBtn.style.display=
+      completedLevel<6
+        ? "block"
+        : "none";
+
+    /*
+     * state.currentLevel already points to the next level,
+     * so preserve the level that actually completed.
+     */
+    levelOverlay.dataset.completedLevel=
+      String(completedLevel);
+
+    levelOverlay.classList.remove("hidden");
+  }
+
+  function startNextLevel(){
+    const completedLevel=
+      Number(
+        levelOverlay.dataset.completedLevel
+        || currentLevel
+      );
+
+    levelOverlay.classList.add("hidden");
+
+    openLevel(
+      Math.min(
+        6,
+        completedLevel+1
+      )
+    );
+  }
+
+  function returnPausedToMindMate(){
+    const p=getLevelProgress(currentLevel);
+    notifySessionEnd("PAUSED",0,p.percent);
+  }
+
+  function returnCompletedToMindMate(){
+    const completedLevel=
+      Number(
+        levelOverlay.dataset.completedLevel
+        || currentLevel
+      );
+
+    notifySessionEnd(
+      "COMPLETED",
+      lastCompletionPoints,
+      100,
+      completedLevel
+    );
+  }
+
+  function notifySessionEnd(
+    status,
+    points,
+    percent,
+    levelOverride=null
+  ){
+    if(resultSent) return;
+    resultSent=true;
+    saveState();
+
+    const resultLevel=
+      levelOverride===null
+        ? currentLevel
+        : Number(levelOverride);
+
+    // Preferred bridge: lets Android return to Chat with 0 points for pause,
+    // or +10 only for a completed level.
+    try{
+      if(typeof Android!=="undefined" && typeof Android.mandalaSessionEnded==="function"){
+        Android.mandalaSessionEnded(
+          status,
+          String(resultLevel),
           String(percent),
-          String(SESSION_SECONDS)
+          String(SESSION_SECONDS),
+          String(points)
         );
         return;
       }
     }catch(e){}
+
+    // Fallback for current GameWebViewActivity:
+    // Only completed levels call gameFinished, avoiding +10 for an incomplete session.
+    if(status==="COMPLETED"){
+      try{
+        if(typeof Android!=="undefined" && typeof Android.gameFinished==="function"){
+          Android.gameFinished(
+            "mandala_paint_level_"+String(resultLevel),
+            String(percent),
+            String(SESSION_SECONDS)
+          );
+          return;
+        }
+      }catch(e){}
+    }
+
+    // If native pause bridge is not added yet, keep progress saved and return home in WebView.
+    resultSent=false;
+    sessionOverlay.classList.add("hidden");
+    gameScreen.classList.add("hidden");
+    homeScreen.classList.remove("hidden");
+    renderHome();
+    showToast("Progress saved. Native return hook will be connected next.");
   }
 
-  // If native pause bridge is not added yet, keep progress saved and return home in WebView.
-  resultSent=false;
-  sessionOverlay.classList.add("hidden");
-  gameScreen.classList.add("hidden");
-  homeScreen.classList.remove("hidden");
-  renderHome();
-  showToast("Progress saved. Native return hook will be connected next.");
-}
-
-function leaveToHome(){
-  clearInterval(sessionTimer);
-  saveState();
-  gameScreen.classList.add("hidden");
-  homeScreen.classList.remove("hidden");
-  renderHome();
-}
-
-function sparkle(x,y,color){
-  for(let i=0;i<6;i++){
-    const s=document.createElement("div");
-    s.className="spark";
-    s.style.left=x+"px";s.style.top=y+"px";s.style.background=color;
-    const a=Math.random()*Math.PI*2,d=18+Math.random()*30;
-    s.style.setProperty("--x",Math.cos(a)*d+"px");
-    s.style.setProperty("--y",Math.sin(a)*d+"px");
-    document.body.appendChild(s);
-    setTimeout(()=>s.remove(),600);
+  function leaveToHome(){
+    clearInterval(sessionTimer);
+    saveState();
+    gameScreen.classList.add("hidden");
+    homeScreen.classList.remove("hidden");
+    renderHome();
   }
-}
 
-function showToast(text){
-  toastEl.textContent=text;
-  toastEl.classList.add("show");
-  setTimeout(()=>toastEl.classList.remove("show"),1800);
-}
+  function sparkle(x,y,color){
+    for(let i=0;i<6;i++){
+      const s=document.createElement("div");
+      s.className="spark";
+      s.style.left=x+"px";s.style.top=y+"px";s.style.background=color;
+      const a=Math.random()*Math.PI*2,d=18+Math.random()*30;
+      s.style.setProperty("--x",Math.cos(a)*d+"px");
+      s.style.setProperty("--y",Math.sin(a)*d+"px");
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(),600);
+    }
+  }
 
-loadState();
-renderHome();
+  function showToast(text){
+    toastEl.textContent=text;
+    toastEl.classList.add("show");
+    setTimeout(()=>toastEl.classList.remove("show"),1800);
+  }
+
+  loadState();
+  renderHome();
 </script>
 </body>
 </html>

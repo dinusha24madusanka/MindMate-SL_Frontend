@@ -216,6 +216,38 @@ class GameWebViewActivity : AppCompatActivity() {
          * PAUSED    = level not completed
          * COMPLETED = level completed
          */
+        /*
+         * Reward a Mandala level immediately when it reaches 100%.
+         *
+         * Returns:
+         * 10 = reward granted now
+         * 0  = this level was already rewarded
+         *
+         * This does NOT close GameWebViewActivity.
+         */
+        @JavascriptInterface
+        fun mandalaLevelCompleted(
+            level: String,
+            durationSeconds: String
+        ): Int {
+
+            val finalLevel =
+                level.toIntOrNull()
+                    ?.coerceIn(1, 6)
+                    ?: 1
+
+            val finalDuration =
+                durationSeconds.toIntOrNull()
+                    ?.coerceAtLeast(0)
+                    ?: 0
+
+            return awardMandalaLevelOnce(
+                finalLevel,
+                finalDuration
+            )
+        }
+
+
         @JavascriptInterface
         fun mandalaSessionEnded(
             status: String,
@@ -240,13 +272,23 @@ class GameWebViewActivity : AppCompatActivity() {
                     ?.coerceAtLeast(0)
                     ?: 0
 
+            /*
+             * This value is only returned to Chat for the completion message.
+             * Real MindPoints are awarded natively by mandalaLevelCompleted().
+             */
+            val finalPoints =
+                points.toIntOrNull()
+                    ?.coerceIn(0, 10)
+                    ?: 0
+
             runOnUiThread {
 
                 handleMandalaSessionEnded(
                     status,
                     finalLevel,
                     finalPercent,
-                    finalDuration
+                    finalDuration,
+                    finalPoints
                 )
             }
         }
@@ -302,17 +344,22 @@ class GameWebViewActivity : AppCompatActivity() {
         finish()
     }
 
+    /*
+     * Called when Mandala returns to Chat.
+     *
+     * The +10 reward is normally granted at the exact moment the level
+     * reaches 100%, so this method must not blindly add points again.
+     */
     private fun handleMandalaSessionEnded(
         status: String,
         level: Int,
         percent: Int,
-        durationSeconds: Int
+        durationSeconds: Int,
+        resultPoints: Int
     ) {
 
         if (resultHandled) return
-
         resultHandled = true
-
 
         val completed =
             status.equals(
@@ -320,54 +367,53 @@ class GameWebViewActivity : AppCompatActivity() {
                 ignoreCase = true
             )
 
-
         /*
-         * IMPORTANT:
-         *
-         * Incomplete 120-sec session = 0 points
-         * Level fully completed      = +10 points
+         * Defensive fallback for an older HTML file:
+         * if COMPLETED returns without the immediate reward callback,
+         * grant the level reward here once.
          */
-        val awardedPoints =
+        val pointsForResult =
             if (completed) {
-                10
+
+                val alreadyRewarded =
+                    getSharedPreferences(
+                        "MindMatePrefs",
+                        Context.MODE_PRIVATE
+                    )
+                        .getBoolean(
+                            "MANDALA_LEVEL_${level}_REWARDED",
+                            false
+                        )
+
+                if (!alreadyRewarded) {
+                    awardMandalaLevelOnce(
+                        level,
+                        durationSeconds
+                    )
+                } else {
+                    resultPoints
+                }
+
             } else {
                 0
             }
 
-
-        if (completed) {
-
-            saveGameCompletion(
-                "mandala_paint_level_$level",
-                percent,
-                durationSeconds
-            )
-
-            addMindPoints(
-                awardedPoints
-            )
-        }
-
-
         /*
-         * Save useful Mandala session information
+         * Store the last Mandala state used by Chat's dynamic suggestion.
          */
         getSharedPreferences(
             "MindMatePrefs",
             Context.MODE_PRIVATE
         )
             .edit()
-
             .putInt(
                 "MANDALA_LAST_LEVEL",
                 level
             )
-
             .putInt(
                 "MANDALA_LAST_PERCENT",
                 percent
             )
-
             .putString(
                 "MANDALA_LAST_STATUS",
                 if (completed) {
@@ -376,18 +422,12 @@ class GameWebViewActivity : AppCompatActivity() {
                     "PAUSED"
                 }
             )
-
             .putLong(
                 "MANDALA_LAST_SESSION_AT",
                 System.currentTimeMillis()
             )
-
             .apply()
 
-
-        /*
-         * Return result to ChatFragment
-         */
         val resultIntent =
             Intent().apply {
 
@@ -408,7 +448,7 @@ class GameWebViewActivity : AppCompatActivity() {
 
                 putExtra(
                     RESULT_POINTS,
-                    awardedPoints
+                    pointsForResult
                 )
 
                 putExtra(
@@ -431,13 +471,78 @@ class GameWebViewActivity : AppCompatActivity() {
                 )
             }
 
-
         setResult(
             RESULT_OK,
             resultIntent
         )
 
         finish()
+    }
+
+
+    /*
+     * Grant +10 only once per Mandala level.
+     *
+     * The rewarded flag is saved before points are added so duplicate
+     * JavaScript callbacks cannot grant the same level twice.
+     */
+    private fun awardMandalaLevelOnce(
+        level: Int,
+        durationSeconds: Int
+    ): Int {
+
+        val prefs =
+            getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+
+        val rewardKey =
+            "MANDALA_LEVEL_${level}_REWARDED"
+
+        if (
+            prefs.getBoolean(
+                rewardKey,
+                false
+            )
+        ) {
+            return 0
+        }
+
+        prefs.edit()
+            .putBoolean(
+                rewardKey,
+                true
+            )
+            .putInt(
+                "MANDALA_LAST_LEVEL",
+                level
+            )
+            .putInt(
+                "MANDALA_LAST_PERCENT",
+                100
+            )
+            .putString(
+                "MANDALA_LAST_STATUS",
+                "COMPLETED"
+            )
+            .putLong(
+                "MANDALA_LAST_SESSION_AT",
+                System.currentTimeMillis()
+            )
+            .apply()
+
+        saveGameCompletion(
+            "mandala_paint_level_$level",
+            100,
+            durationSeconds
+        )
+
+        addMindPoints(
+            MANDALA_LEVEL_REWARD
+        )
+
+        return MANDALA_LEVEL_REWARD
     }
 
 
@@ -716,5 +821,8 @@ class GameWebViewActivity : AppCompatActivity() {
 
         const val RESULT_MANDALA_PERCENT =
             "result_mandala_percent"
+
+        const val MANDALA_LEVEL_REWARD =
+            10
     }
 }
