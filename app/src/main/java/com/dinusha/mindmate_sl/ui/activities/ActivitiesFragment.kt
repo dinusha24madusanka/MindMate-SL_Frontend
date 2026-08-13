@@ -83,11 +83,11 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
             ),
 
             GameItem(
-                "Zen Blocks",
-                "A simple concentration game.",
-                "5 Mins",
+                "Mandala Paint Flow",
+                "A relaxing 2-minute color-by-number mandala activity.",
+                "2 Mins",
                 R.drawable.ic_activities,
-                ""
+                "file:///android_asset/games/mandala_paint_flow.html"
             ),
 
             GameItem(

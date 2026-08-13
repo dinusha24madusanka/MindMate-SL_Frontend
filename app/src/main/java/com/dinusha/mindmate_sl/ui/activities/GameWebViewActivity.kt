@@ -143,6 +143,10 @@ class GameWebViewActivity : AppCompatActivity() {
 
     inner class GameBridge {
 
+        /*
+         * Existing games:
+         * Calm Bubbles etc.
+         */
         @JavascriptInterface
         fun gameFinished(
             gameId: String,
@@ -161,6 +165,87 @@ class GameWebViewActivity : AppCompatActivity() {
                 handleGameFinished(
                     gameId,
                     finalScore,
+                    finalDuration
+                )
+            }
+        }
+
+
+        /*
+         * Mandala exact progress save
+         */
+        @JavascriptInterface
+        fun saveMandalaProgress(
+            progressJson: String
+        ) {
+
+            getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+                .edit()
+                .putString(
+                    MANDALA_PROGRESS_KEY,
+                    progressJson
+                )
+                .apply()
+        }
+
+
+        /*
+         * Mandala saved progress restore
+         */
+        @JavascriptInterface
+        fun getMandalaProgress(): String {
+
+            return getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+                .getString(
+                    MANDALA_PROGRESS_KEY,
+                    ""
+                ) ?: ""
+        }
+
+
+        /*
+         * 120-sec Mandala session end
+         *
+         * status:
+         * PAUSED    = level not completed
+         * COMPLETED = level completed
+         */
+        @JavascriptInterface
+        fun mandalaSessionEnded(
+            status: String,
+            level: String,
+            percent: String,
+            durationSeconds: String,
+            points: String
+        ) {
+
+            val finalLevel =
+                level.toIntOrNull()
+                    ?.coerceIn(1, 6)
+                    ?: 1
+
+            val finalPercent =
+                percent.toIntOrNull()
+                    ?.coerceIn(0, 100)
+                    ?: 0
+
+            val finalDuration =
+                durationSeconds.toIntOrNull()
+                    ?.coerceAtLeast(0)
+                    ?: 0
+
+            runOnUiThread {
+
+                handleMandalaSessionEnded(
+                    status,
+                    finalLevel,
+                    finalPercent,
                     finalDuration
                 )
             }
@@ -208,6 +293,144 @@ class GameWebViewActivity : AppCompatActivity() {
                 10
             )
         }
+
+        setResult(
+            RESULT_OK,
+            resultIntent
+        )
+
+        finish()
+    }
+
+    private fun handleMandalaSessionEnded(
+        status: String,
+        level: Int,
+        percent: Int,
+        durationSeconds: Int
+    ) {
+
+        if (resultHandled) return
+
+        resultHandled = true
+
+
+        val completed =
+            status.equals(
+                "COMPLETED",
+                ignoreCase = true
+            )
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Incomplete 120-sec session = 0 points
+         * Level fully completed      = +10 points
+         */
+        val awardedPoints =
+            if (completed) {
+                10
+            } else {
+                0
+            }
+
+
+        if (completed) {
+
+            saveGameCompletion(
+                "mandala_paint_level_$level",
+                percent,
+                durationSeconds
+            )
+
+            addMindPoints(
+                awardedPoints
+            )
+        }
+
+
+        /*
+         * Save useful Mandala session information
+         */
+        getSharedPreferences(
+            "MindMatePrefs",
+            Context.MODE_PRIVATE
+        )
+            .edit()
+
+            .putInt(
+                "MANDALA_LAST_LEVEL",
+                level
+            )
+
+            .putInt(
+                "MANDALA_LAST_PERCENT",
+                percent
+            )
+
+            .putString(
+                "MANDALA_LAST_STATUS",
+                if (completed) {
+                    "COMPLETED"
+                } else {
+                    "PAUSED"
+                }
+            )
+
+            .putLong(
+                "MANDALA_LAST_SESSION_AT",
+                System.currentTimeMillis()
+            )
+
+            .apply()
+
+
+        /*
+         * Return result to ChatFragment
+         */
+        val resultIntent =
+            Intent().apply {
+
+                putExtra(
+                    RESULT_GAME_ID,
+                    "mandala_paint_flow"
+                )
+
+                putExtra(
+                    RESULT_GAME_SCORE,
+                    percent
+                )
+
+                putExtra(
+                    RESULT_GAME_DURATION,
+                    durationSeconds
+                )
+
+                putExtra(
+                    RESULT_POINTS,
+                    awardedPoints
+                )
+
+                putExtra(
+                    RESULT_GAME_STATUS,
+                    if (completed) {
+                        "COMPLETED"
+                    } else {
+                        "PAUSED"
+                    }
+                )
+
+                putExtra(
+                    RESULT_MANDALA_LEVEL,
+                    level
+                )
+
+                putExtra(
+                    RESULT_MANDALA_PERCENT,
+                    percent
+                )
+            }
+
 
         setResult(
             RESULT_OK,
@@ -477,5 +700,21 @@ class GameWebViewActivity : AppCompatActivity() {
 
         const val RESULT_POINTS =
             "result_points"
+
+        //Mandala
+        const val MANDALA_PROGRESS_KEY =
+            "MANDALA_PAINT_PROGRESS_JSON"
+
+
+        const val RESULT_GAME_STATUS =
+            "result_game_status"
+
+
+        const val RESULT_MANDALA_LEVEL =
+            "result_mandala_level"
+
+
+        const val RESULT_MANDALA_PERCENT =
+            "result_mandala_percent"
     }
 }

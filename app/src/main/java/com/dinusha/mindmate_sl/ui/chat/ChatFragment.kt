@@ -53,6 +53,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private lateinit var btnSuggestedBreathing: MaterialButton
     private lateinit var btnSuggestedGrounding: MaterialButton
     private lateinit var btnKeepChatting: MaterialButton
+    private lateinit var tvGameSuggestion: TextView
+
+    private var suggestedGameType = "CALM_BUBBLES"
+    private var suggestedMandalaLevel = 1
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,6 +95,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
         // 2. තෝරාගත් රොබෝවා අනුව ඉහළ Header එක සැකසීම
         setupTopHeader()
+
+        tvGameSuggestion =
+            view.findViewById(R.id.tvGameSuggestion)
 
         // 3. Setup RecyclerView
         chatAdapter = ChatAdapter(messageList)
@@ -134,6 +141,48 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     }
                 })
             }
+        }
+
+        btnPlaySuggestedGame.setOnClickListener {
+
+            cardGameSuggestion.visibility = View.GONE
+
+            val intent =
+                Intent(
+                    requireContext(),
+                    GameWebViewActivity::class.java
+                )
+
+            when (suggestedGameType) {
+
+                "MANDALA" -> {
+
+                    intent.putExtra(
+                        GameWebViewActivity.EXTRA_TITLE,
+                        "Mandala Paint Flow"
+                    )
+
+                    intent.putExtra(
+                        GameWebViewActivity.EXTRA_URL,
+                        "file:///android_asset/games/mandala_paint_flow.html"
+                    )
+                }
+
+                else -> {
+
+                    intent.putExtra(
+                        GameWebViewActivity.EXTRA_TITLE,
+                        "Calm Bubbles"
+                    )
+
+                    intent.putExtra(
+                        GameWebViewActivity.EXTRA_URL,
+                        "file:///android_asset/games/calm_bubbles.html"
+                    )
+                }
+            }
+
+            gameLauncher.launch(intent)
         }
 
         btnSuggestedBreathing.setOnClickListener {
@@ -293,11 +342,46 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
                 if (gameId.isNotEmpty()) {
 
-                    onMiniGameCompleted(
-                        gameId,
-                        score,
-                        points
-                    )
+                    if (
+                        gameId ==
+                        "mandala_paint_flow"
+                    ) {
+
+                        val status =
+                            data?.getStringExtra(
+                                GameWebViewActivity.RESULT_GAME_STATUS
+                            ) ?: "PAUSED"
+
+
+                        val mandalaLevel =
+                            data?.getIntExtra(
+                                GameWebViewActivity.RESULT_MANDALA_LEVEL,
+                                1
+                            ) ?: 1
+
+
+                        val mandalaPercent =
+                            data?.getIntExtra(
+                                GameWebViewActivity.RESULT_MANDALA_PERCENT,
+                                0
+                            ) ?: 0
+
+
+                        onMandalaSessionReturned(
+                            status,
+                            mandalaLevel,
+                            mandalaPercent,
+                            points
+                        )
+
+                    } else {
+
+                        onMiniGameCompleted(
+                            gameId,
+                            score,
+                            points
+                        )
+                    }
                 }
             }
         }
@@ -449,12 +533,193 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     /**
      * Stress Score එක අනුව ක්‍රීඩා හෝ වෙනත් ක්‍රියාකාරකම් යෝජනා කිරීම
      */
-    private fun handleActivitySuggestion(stressScore: Int) {
-        if (stressScore > 70) {
-            cardGameSuggestion.visibility = View.VISIBLE
-        } else {
-            cardGameSuggestion.visibility = View.GONE
+    private fun handleActivitySuggestion(
+        stressScore: Int
+    ) {
+
+        if (stressScore <= 70) {
+
+            cardGameSuggestion.visibility =
+                View.GONE
+
+            return
         }
+
+
+        val prefs =
+            requireContext()
+                .getSharedPreferences(
+                    "MindMatePrefs",
+                    Context.MODE_PRIVATE
+                )
+
+
+        val mandalaStatus =
+            prefs.getString(
+                "MANDALA_LAST_STATUS",
+                ""
+            ) ?: ""
+
+
+        val mandalaLevel =
+            prefs.getInt(
+                "MANDALA_LAST_LEVEL",
+                1
+            )
+
+
+        val mandalaPercent =
+            prefs.getInt(
+                "MANDALA_LAST_PERCENT",
+                0
+            )
+
+
+        /*
+         * Incomplete Mandala session thiyenawanam
+         * eka priority denna.
+         */
+        if (
+            mandalaStatus == "PAUSED"
+            &&
+            mandalaPercent > 0
+            &&
+            mandalaPercent < 100
+        ) {
+
+            suggestedGameType =
+                "MANDALA"
+
+            suggestedMandalaLevel =
+                mandalaLevel
+
+
+            tvGameSuggestion.text =
+                "You already have Mandala Flow progress saved 🌸\n" +
+                        "Level $mandalaLevel • $mandalaPercent% complete. " +
+                        "Would you like to continue your 2-minute break?"
+
+
+            btnPlaySuggestedGame.text =
+                "🌸 Continue Level $mandalaLevel"
+
+
+            cardGameSuggestion.visibility =
+                View.VISIBLE
+
+            return
+        }
+
+
+        /*
+         * Previous Mandala level completed.
+         * Next level available.
+         */
+        if (
+            mandalaStatus == "COMPLETED"
+            &&
+            mandalaLevel < 6
+        ) {
+
+            val nextLevel =
+                mandalaLevel + 1
+
+
+            suggestedGameType =
+                "MANDALA"
+
+            suggestedMandalaLevel =
+                nextLevel
+
+
+            tvGameSuggestion.text =
+                "Your next Mandala Flow level is ready ✨\n" +
+                        "Would you like another short 2-minute activity?"
+
+
+            btnPlaySuggestedGame.text =
+                "🌸 Start Level $nextLevel"
+
+
+            cardGameSuggestion.visibility =
+                View.VISIBLE
+
+            return
+        }
+
+
+        /*
+         * Default suggestion
+         */
+        suggestedGameType =
+            "CALM_BUBBLES"
+
+
+        tvGameSuggestion.text =
+            "Would you like a short 60-second break with Calm Bubbles?"
+
+
+        btnPlaySuggestedGame.text =
+            "🫧 Calm Bubbles"
+
+
+        cardGameSuggestion.visibility =
+            View.VISIBLE
+    }
+
+    private fun onMandalaSessionReturned(
+        status: String,
+        level: Int,
+        percent: Int,
+        points: Int
+    ) {
+
+        cardGameSuggestion.visibility =
+            View.GONE
+
+
+        if (
+            status.equals(
+                "COMPLETED",
+                ignoreCase = true
+            )
+        ) {
+
+            val message =
+
+                if (level < 6) {
+
+                    "Great work 🌿 You completed Mandala Flow Level $level " +
+                            "and earned +$points MindPoints. " +
+                            "Level ${level + 1} is now unlocked ✨ " +
+                            "How are you feeling now?"
+
+                } else {
+
+                    "Great work 🌿 You completed Mandala Flow Level 6 " +
+                            "and earned +$points MindPoints. " +
+                            "You have completed all six Mandala levels ✨ " +
+                            "How are you feeling now?"
+                }
+
+
+            addBotMessage(
+                message
+            )
+
+        } else {
+
+            addBotMessage(
+                "Nice work taking a short break 🌿 " +
+                        "Your Mandala Flow Level $level progress has been saved at $percent%. " +
+                        "You can continue from here next time. " +
+                        "How are you feeling now?"
+            )
+        }
+
+
+        cardFeelingCheck.visibility =
+            View.VISIBLE
     }
 
     private fun onMiniGameCompleted(
