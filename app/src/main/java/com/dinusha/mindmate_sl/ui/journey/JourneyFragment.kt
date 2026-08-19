@@ -502,51 +502,86 @@ class JourneyFragment : Fragment() {
 
     private fun generateInsight() {
 
-        val calendar = Calendar.getInstance()
+        val calendar =
+            Calendar.getInstance()
 
-        // Current week එක Monday එකෙන් start කරනවා
+        // Current week starts on Monday
         calendar.set(
             Calendar.DAY_OF_WEEK,
             Calendar.MONDAY
         )
 
-        val scores = mutableListOf<Pair<Int, Int>>()
 
-        var highestStress = -1
-        var highestStressDay = ""
+        val scores =
+            mutableListOf<Pair<Int, Int>>()
 
-        var totalStress = 0
+
+        var highestScore = -1
+
+        var highestScoreDay = ""
+
+        var totalScore = 0
+
 
         for (dayIndex in 0 until 7) {
 
-            val dateKey = SimpleDateFormat(
-                "yyyy-MM-dd",
-                Locale.getDefault()
-            ).format(calendar.time)
-
-            if (preferences.contains("${dateKey}_stress")) {
-
-                val stressScore = preferences.getInt(
-                    "${dateKey}_stress",
-                    0
+            val dateKey =
+                SimpleDateFormat(
+                    "yyyy-MM-dd",
+                    Locale.getDefault()
+                ).format(
+                    calendar.time
                 )
+
+
+            // Only backend AI-derived daily averages
+            if (
+                preferences.contains(
+                    "${dateKey}_stress"
+                )
+            ) {
+
+                val score =
+                    preferences.getInt(
+                        "${dateKey}_stress",
+                        0
+                    )
+                        .coerceIn(
+                            0,
+                            100
+                        )
+
 
                 scores.add(
-                    Pair(dayIndex, stressScore)
+                    Pair(
+                        dayIndex,
+                        score
+                    )
                 )
 
-                totalStress += stressScore
 
-                if (stressScore > highestStress) {
+                totalScore +=
+                    score
 
-                    highestStress = stressScore
 
-                    highestStressDay = SimpleDateFormat(
-                        "EEEE",
-                        Locale.getDefault()
-                    ).format(calendar.time)
+                if (
+                    score > highestScore
+                ) {
+
+                    highestScore =
+                        score
+
+
+                    highestScoreDay =
+                        SimpleDateFormat(
+                            "EEEE",
+                            Locale.getDefault()
+                        ).format(
+                            calendar.time
+                        )
                 }
             }
+
 
             calendar.add(
                 Calendar.DAY_OF_MONTH,
@@ -554,49 +589,71 @@ class JourneyFragment : Fragment() {
             )
         }
 
-        // No AI data
-        if (scores.isEmpty()) {
+
+        // =====================================================
+        // NO DATA
+        // =====================================================
+
+        if (
+            scores.isEmpty()
+        ) {
 
             weeklyAverageText.text =
                 "Weekly Average: --"
 
             highestStressText.text =
-                "Highest Stress: --"
+                "Highest Daily Score: --"
 
             stressTrendText.text =
                 "Trend: Not enough data"
 
             dataCoverageText.text =
-                "Data: 0 of 7 days"
+                "AI chat data: 0 of 7 days"
 
             aiInsightText.text =
-                "Chat with MindMate during the week to build your stress trend and receive personalized insights."
+                "No AI-derived stress score data is available for this week yet. " +
+                        "Chat with MindMate during the week to build your weekly score summary."
 
             return
         }
 
-        // -------------------------------
-        // Average stress
-        // -------------------------------
 
-        val averageStress =
-            totalStress.toDouble() / scores.size
+        // =====================================================
+        // WEEKLY AVERAGE
+        // =====================================================
+
+        val averageScore =
+            totalScore.toDouble() /
+                    scores.size.toDouble()
+
+
+        val roundedAverage =
+            kotlin.math.round(
+                averageScore
+            ).toInt()
+
 
         weeklyAverageText.text =
-            "Weekly Average: ${averageStress.toInt()}/100"
+            "Weekly Average: $roundedAverage/100"
+
 
         highestStressText.text =
-            "Highest Stress: $highestStress/100 on $highestStressDay"
+            "Highest Daily Score: $highestScore/100 on $highestScoreDay"
+
 
         dataCoverageText.text =
-            "Data: ${scores.size} of 7 days"
+            "AI chat data: ${scores.size} of 7 days"
 
-        // -------------------------------
-        // Trend calculation
-        // -------------------------------
+
+        // =====================================================
+        // TREND
+        // =====================================================
 
         val trendSlope =
-            calculateTrendSlope(scores)
+            calculateTrendSlope(
+                scores
+            )
+
 
         val trendText =
             when {
@@ -605,7 +662,7 @@ class JourneyFragment : Fragment() {
                     "Not enough data"
 
                 trendSlope <= -3 ->
-                    "Improving ↓"
+                    "Decreasing ↓"
 
                 trendSlope >= 3 ->
                     "Increasing ↑"
@@ -614,18 +671,20 @@ class JourneyFragment : Fragment() {
                     "Stable →"
             }
 
+
         stressTrendText.text =
             "Trend: $trendText"
 
-        // -------------------------------
-        // Dynamic insight
-        // -------------------------------
+
+        // =====================================================
+        // DYNAMIC INSIGHT
+        // =====================================================
 
         aiInsightText.text =
             buildDynamicInsight(
-                averageStress = averageStress,
-                highestStress = highestStress,
-                highestStressDay = highestStressDay,
+                averageStress = averageScore,
+                highestStress = highestScore,
+                highestStressDay = highestScoreDay,
                 trendSlope = trendSlope,
                 dataCount = scores.size
             )
@@ -678,61 +737,122 @@ class JourneyFragment : Fragment() {
         dataCount: Int
     ): String {
 
-        if (dataCount == 1) {
+        val roundedAverage =
+            kotlin.math.round(
+                averageStress
+            ).toInt()
 
-            return "Only one day of AI stress data is available this week. " +
-                    "Your recorded stress score was ${averageStress.toInt()}/100. " +
-                    "Continue chatting with MindMate during the week so a reliable trend can be identified."
+
+        // =====================================================
+        // ONE DAY ONLY
+        // =====================================================
+
+        if (
+            dataCount == 1
+        ) {
+
+            return (
+                    "Only one day of AI-analyzed chat data is available this week. " +
+                            "The recorded daily average model score is $roundedAverage/100. " +
+                            "More days of chat data are needed before a weekly trend can be described."
+                    )
         }
+
+
+        // =====================================================
+        // SCORE RANGE SUMMARY
+        // =====================================================
 
         val averageMessage =
             when {
 
                 averageStress >= 75 ->
-                    "Your weekly average indicates a high stress pattern."
+
+                    "Your available AI-derived scores are currently in a higher range."
+
 
                 averageStress >= 50 ->
-                    "Your weekly average indicates a moderate stress pattern."
+
+                    "Your available AI-derived scores are currently in a moderate range."
+
 
                 averageStress >= 30 ->
-                    "Your weekly stress level has generally remained manageable."
+
+                    "Your available AI-derived scores are currently in a lower-to-moderate range."
+
 
                 else ->
-                    "Your weekly stress scores have generally remained low."
+
+                    "Your available AI-derived scores are currently in a lower range."
             }
+
+
+        // =====================================================
+        // TREND SUMMARY
+        // =====================================================
 
         val trendMessage =
             when {
 
                 trendSlope <= -3 ->
-                    "Your stress scores are decreasing across the week, which suggests an improving trend."
+
+                    "The available daily scores show a decreasing pattern across the week."
+
 
                 trendSlope >= 3 ->
-                    "Your stress scores are increasing across the week, so it may be useful to pay attention to recent stressors."
+
+                    "The available daily scores show an increasing pattern across the week."
+
 
                 else ->
-                    "Your stress scores have remained relatively stable across the available days."
+
+                    "The available daily scores have remained relatively stable."
             }
 
+
+        // =====================================================
+        // HIGHEST DAILY VALUE
+        // =====================================================
+
         val highestMessage =
-            "The highest recorded daily average was $highestStress/100 on $highestStressDay."
+            "The highest recorded daily average model score is " +
+                    "$highestStress/100 on $highestStressDay."
+
+
+        // =====================================================
+        // SUPPORTIVE NON-CLINICAL MESSAGE
+        // =====================================================
 
         val recommendation =
             when {
 
                 averageStress >= 75 ->
-                    "Consider using a short breathing exercise, taking a break, or discussing what is causing the stress in the MindMate chat."
+
+                    "If you would like a short pause, you can use one of MindMate's supportive activities or continue chatting."
+
 
                 averageStress >= 50 ->
-                    "Regular check-ins, short breaks, and calming activities may help you understand and manage your stress pattern."
+
+                    "Regular check-ins may help you observe how these scores change over time."
+
 
                 trendSlope >= 3 ->
-                    "Continue monitoring the next few days to see whether the upward trend continues."
+
+                    "It may be useful to keep checking in over the next few days to see whether this pattern continues."
+
 
                 else ->
-                    "Continue the routines that appear to be supporting your wellbeing."
+
+                    "Continue checking in to build a clearer weekly picture."
             }
 
-        return "$averageMessage $trendMessage $highestMessage $recommendation"
+
+        return (
+                "$averageMessage " +
+                        "$trendMessage " +
+                        "$highestMessage " +
+                        "$recommendation " +
+                        " These values are AI model outputs and are not a clinical assessment."
+                )
     }
 }
