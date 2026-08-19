@@ -28,6 +28,7 @@ import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
 import com.dinusha.mindmate_sl.ui.activities.BreathingExerciseActivity
 import com.dinusha.mindmate_sl.ui.activities.GroundingExerciseActivity
+import kotlin.math.roundToInt
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     // Views
@@ -996,49 +997,104 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             .apply()
     }
 
-    private fun saveStressScoreToJourney(stressScore: Int) {
+    private fun saveStressScoreToJourney(
+        stressScore: Int
+    ) {
 
-        val preferences = requireContext().getSharedPreferences(
-            "mindmate_journey",
-            android.content.Context.MODE_PRIVATE
-        )
+        // ---------------------------------------------------------
+        // Validate backend score
+        // ---------------------------------------------------------
 
-        val dateKey = java.text.SimpleDateFormat(
-            "yyyy-MM-dd",
-            java.util.Locale.getDefault()
-        ).format(java.util.Date())
+        if (stressScore !in 0..100) {
+            return
+        }
 
-        // අද දවසේ කලින් save කරපු AI scores
-        val currentSum = preferences.getInt(
-            "${dateKey}_ai_stress_sum",
-            0
-        )
 
-        val currentCount = preferences.getInt(
-            "${dateKey}_ai_stress_count",
-            0
-        )
+        val preferences =
+            requireContext().getSharedPreferences(
+                "mindmate_journey",
+                android.content.Context.MODE_PRIVATE
+            )
 
-        // අලුත් score එක එකතු කරනවා
-        val newSum = currentSum + stressScore
-        val newCount = currentCount + 1
 
-        // අද දවසේ average stress score
-        val averageStress = newSum / newCount
+        val dateKey =
+            java.text.SimpleDateFormat(
+                "yyyy-MM-dd",
+                java.util.Locale.getDefault()
+            ).format(
+                java.util.Date()
+            )
+
+
+        // ---------------------------------------------------------
+        // Existing AI scores for today
+        // ---------------------------------------------------------
+
+        val currentSum =
+            preferences.getInt(
+                "${dateKey}_ai_stress_sum",
+                0
+            )
+
+
+        val currentCount =
+            preferences.getInt(
+                "${dateKey}_ai_stress_count",
+                0
+            )
+
+
+        // ---------------------------------------------------------
+        // Add new real backend NLP score
+        // ---------------------------------------------------------
+
+        val newSum =
+            currentSum +
+                    stressScore
+
+
+        val newCount =
+            currentCount +
+                    1
+
+
+        // ---------------------------------------------------------
+        // Calculate rounded daily average
+        // ---------------------------------------------------------
+
+        val averageStress =
+            (
+                    newSum.toDouble() /
+                            newCount.toDouble()
+                    )
+                .roundToInt()
+                .coerceIn(
+                    0,
+                    100
+                )
+
+
+        // ---------------------------------------------------------
+        // Save
+        // ---------------------------------------------------------
 
         preferences.edit()
+
             .putInt(
                 "${dateKey}_ai_stress_sum",
                 newSum
             )
+
             .putInt(
                 "${dateKey}_ai_stress_count",
                 newCount
             )
+
             .putInt(
                 "${dateKey}_stress",
                 averageStress
             )
+
             .apply()
     }
 

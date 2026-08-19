@@ -11,7 +11,7 @@ public class RetrofitClient {
             "http://10.0.2.2:8000/";
 
     private static final String REAL_DEVICE_URL =
-            "http://192.168.220.119:8000/";
+            "http://192.168.8.102/";
 
     private static Retrofit retrofit = null;
 

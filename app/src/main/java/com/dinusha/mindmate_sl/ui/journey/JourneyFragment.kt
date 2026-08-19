@@ -266,14 +266,17 @@ class JourneyFragment : Fragment() {
                 null
             }
 
+
         val calendar =
             Calendar.getInstance()
 
-        // Start from Monday
+
+        // Current week starts on Monday
         calendar.set(
             Calendar.DAY_OF_WEEK,
             Calendar.MONDAY
         )
+
 
         for (i in 0 until 7) {
 
@@ -281,32 +284,44 @@ class JourneyFragment : Fragment() {
                 SimpleDateFormat(
                     "yyyy-MM-dd",
                     Locale.getDefault()
-                ).format(calendar.time)
+                ).format(
+                    calendar.time
+                )
 
-            when {
 
-                // Priority 1 - Real AI stress score
-                preferences.contains("${dateKey}_stress") -> {
+            // Only real backend NLP stress data
+            if (
+                preferences.contains(
+                    "${dateKey}_stress"
+                )
+            ) {
 
-                    values[i] = preferences.getInt(
+                val score =
+                    preferences.getInt(
                         "${dateKey}_stress",
                         0
-                    ).toFloat()
+                    )
+
+
+                // Safety-bypassed / invalid values
+                // should not appear as real stress data.
+                if (score in 1..100) {
+
+                    values[i] =
+                        score.toFloat()
+
+                } else {
+
+                    values[i] =
+                        null
                 }
 
-                // Priority 2 - Mood based estimate
-                preferences.contains("${dateKey}_mood_stress") -> {
+            } else {
 
-                    values[i] = preferences.getInt(
-                        "${dateKey}_mood_stress",
-                        0
-                    ).toFloat()
-                }
-
-                else -> {
-                    values[i] = null
-                }
+                values[i] =
+                    null
             }
+
 
             calendar.add(
                 Calendar.DAY_OF_MONTH,
@@ -314,7 +329,10 @@ class JourneyFragment : Fragment() {
             )
         }
 
-        weeklyStressView.setStressData(values)
+
+        weeklyStressView.setStressData(
+            values
+        )
     }
 
     private fun loadMoodHistory() {

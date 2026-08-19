@@ -1,41 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4FAF8"
-    android:fillViewport="true">
+    android:background="#F5FAF9"
+    android:fillViewport="true"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:paddingStart="16dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="90dp">
 
-        <!-- Header -->
+        <!-- ===================================================== -->
+        <!-- HEADER -->
+        <!-- ===================================================== -->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="My Journey"
-            android:textColor="#004D40"
-            android:textSize="28sp"
+            android:textColor="#063C35"
+            android:textSize="27sp"
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Track your mood and understand your wellbeing."
-            android:textColor="#607D7B"
-            android:textSize="14sp" />
+            android:text="Track your mood, stress patterns, and weekly wellbeing."
+            android:textColor="#718481"
+            android:textSize="13sp" />
 
-        <!-- Daily Check-in -->
+
+        <!-- ===================================================== -->
+        <!-- DAILY CHECK-IN -->
+        <!-- ===================================================== -->
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
+            android:layout_marginTop="18dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1ECE9"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -43,108 +58,145 @@
                 android:orientation="vertical"
                 android:padding="18dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Daily Check-in"
-                    android:textColor="#003D35"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Daily Check-in"
+                        android:textColor="#073D35"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#E5F5F1"
+                        android:paddingStart="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="TODAY"
+                        android:textColor="#00796B"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="5dp"
                     android:text="How are you feeling today?"
-                    android:textColor="#757575"
-                    android:textSize="14sp" />
+                    android:textColor="#718481"
+                    android:textSize="13sp" />
 
+
+                <!-- Mood selector -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:background="#F6FAF9"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
 
                     <TextView
                         android:id="@+id/moodVeryBad"
                         android:layout_width="0dp"
-                        android:layout_height="60dp"
+                        android:layout_height="58dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="😞"
-                        android:textSize="30sp" />
+                        android:textSize="28sp" />
 
                     <TextView
                         android:id="@+id/moodBad"
                         android:layout_width="0dp"
-                        android:layout_height="60dp"
+                        android:layout_height="58dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="😕"
-                        android:textSize="30sp" />
+                        android:textSize="28sp" />
 
                     <TextView
                         android:id="@+id/moodOkay"
                         android:layout_width="0dp"
-                        android:layout_height="60dp"
+                        android:layout_height="58dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="😐"
-                        android:textSize="30sp" />
+                        android:textSize="28sp" />
 
                     <TextView
                         android:id="@+id/moodGood"
                         android:layout_width="0dp"
-                        android:layout_height="60dp"
+                        android:layout_height="58dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="🙂"
-                        android:textSize="30sp" />
+                        android:textSize="28sp" />
 
                     <TextView
                         android:id="@+id/moodGreat"
                         android:layout_width="0dp"
-                        android:layout_height="60dp"
+                        android:layout_height="58dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="😄"
-                        android:textSize="30sp" />
+                        android:textSize="28sp" />
 
                 </LinearLayout>
+
 
                 <TextView
                     android:id="@+id/selectedMoodText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:layout_marginTop="6dp"
                     android:text="Select your mood"
-                    android:textColor="#607D7B"
-                    android:textSize="14sp" />
+                    android:textColor="#607D79"
+                    android:textSize="13sp" />
+
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/saveMoodButton"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="15dp"
                     android:text="Save Today's Check-in"
                     android:textAllCaps="false"
-                    android:textSize="16sp"
-                    app:backgroundTint="#00695C"
-                    app:cornerRadius="16dp" />
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#00796B"
+                    app:cornerRadius="15dp" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Weekly Stress -->
+
+        <!-- ===================================================== -->
+        <!-- WEEKLY STRESS TREND -->
+        <!-- ===================================================== -->
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1ECE9"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -152,39 +204,114 @@
                 android:orientation="vertical"
                 android:padding="18dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Weekly Stress Trend"
-                    android:textColor="#003D35"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Weekly Stress Trend"
+                            android:textColor="#073D35"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Based on AI-analyzed chat stress scores"
+                            android:textColor="#718481"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#E7F5F2"
+                        android:paddingStart="10dp"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="6dp"
+                        android:text="7 DAYS"
+                        android:textColor="#00796B"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+                <!-- Chart legend -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="Based on your daily check-ins"
-                    android:textColor="#757575"
-                    android:textSize="13sp" />
+                    android:layout_marginTop="15dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="●"
+                        android:textColor="#00897B"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="AI stress probability indicator"
+                        android:textColor="#78909C"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+
+                <!-- Custom weekly chart -->
                 <com.dinusha.mindmate_sl.ui.journey.WeeklyStressView
                     android:id="@+id/weeklyStressView"
                     android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_marginTop="14dp" />
+                    android:layout_height="260dp"
+                    android:layout_marginTop="8dp" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center"
+                    android:text="0 = lower model probability • 100 = higher model probability"
+                    android:textColor="#90A4AE"
+                    android:textSize="10sp" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- AI Insights -->
+
+        <!-- ===================================================== -->
+        <!-- AI INSIGHTS -->
+        <!-- ===================================================== -->
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1ECE9"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -196,88 +323,119 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="✨ AI Insights"
-                    android:textColor="#003D35"
-                    android:textSize="20sp"
+                    android:textColor="#073D35"
+                    android:textSize="19sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="Based on your AI-analyzed chat stress scores"
-                    android:textColor="#78909C"
-                    android:textSize="13sp" />
+                    android:text="Summary of your recent AI-analyzed chat scores"
+                    android:textColor="#718481"
+                    android:textSize="12sp" />
 
-                <!-- Average -->
-                <TextView
-                    android:id="@+id/weeklyAverageText"
+
+                <!-- Stats container -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Weekly Average: --"
-                    android:textColor="#263238"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="16dp"
+                    android:background="#F7FAFA"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                <!-- Highest Stress -->
-                <TextView
-                    android:id="@+id/highestStressText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Highest Stress: --"
-                    android:textColor="#263238"
-                    android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/weeklyAverageText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Weekly Average: --"
+                        android:textColor="#263238"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
 
-                <!-- Trend -->
-                <TextView
-                    android:id="@+id/stressTrendText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Trend: --"
-                    android:textColor="#263238"
-                    android:textSize="15sp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:background="#E5ECEA" />
 
-                <!-- Data coverage -->
-                <TextView
-                    android:id="@+id/dataCoverageText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Data: --"
-                    android:textColor="#78909C"
-                    android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/highestStressText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Highest Stress: --"
+                        android:textColor="#455A64"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/stressTrendText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Trend: --"
+                        android:textColor="#455A64"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/dataCoverageText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Data: --"
+                        android:textColor="#78909C"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:background="#E0E8E6" />
+                    android:layout_marginTop="15dp"
+                    android:background="#E5ECEA" />
 
-                <!-- Dynamic Insight -->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Weekly observation"
+                    android:textColor="#00796B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+
                 <TextView
                     android:id="@+id/aiInsightText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="6dp"
                     android:lineSpacingExtra="4dp"
                     android:text="More chat data is needed to generate your weekly insight."
                     android:textColor="#455A64"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Mood History -->
+
+        <!-- ===================================================== -->
+        <!-- MOOD HISTORY -->
+        <!-- ===================================================== -->
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1ECE9"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -289,15 +447,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Mood History"
-                    android:textColor="#003D35"
-                    android:textSize="20sp"
+                    android:textColor="#073D35"
+                    android:textSize="19sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Your recent self-reported daily check-ins"
+                    android:textColor="#718481"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:id="@+id/moodHistoryContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="14dp"
                     android:orientation="vertical" />
 
             </LinearLayout>
