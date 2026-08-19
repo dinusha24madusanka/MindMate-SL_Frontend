@@ -112,14 +112,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
                         if (response.isSuccessful && response.body() != null) {
 
-                            val aiReply = response.body()!!.reply
-                            val stressScore = response.body()!!.stressScore
+                            val body = response.body()!!
 
-                            // AI stress score එක Journey එකට save කරනවා
-                            saveStressScoreToJourney(stressScore)
-
-                            // Chat UI එකට reply එක දානවා
-                            receiveBotResponse(aiReply, stressScore)
+                            handleHybridResponse(body)
 
                         } else {
                             receiveBotResponse("Server error, please try again later.", 50)
@@ -471,6 +466,287 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
         // 4. රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම
         addBotMessage(reply)
+    }
+
+    private fun handleHybridResponse(
+        response: ChatResponse
+    ) {
+
+        val reply = response.reply
+
+        val riskLevel =
+            response.riskLevel ?: "NONE"
+
+        val allowGamification =
+            response.isAllowGamification
+
+        val recommendedActivity =
+            response.recommendedActivity ?: "NONE"
+
+
+        // =========================================
+        // HIGH-RISK SAFETY FLOW
+        // =========================================
+
+        if (
+            riskLevel.equals(
+                "HIGH",
+                ignoreCase = true
+            )
+            ||
+            !allowGamification
+        ) {
+
+            // Games / activities completely hide
+            cardGameSuggestion.visibility =
+                View.GONE
+
+            cardSupportActivity.visibility =
+                View.GONE
+
+            cardFeelingCheck.visibility =
+                View.GONE
+
+
+            // IMPORTANT:
+            // Backend stress_score = 0 here because
+            // normal NLP was bypassed.
+            // So Journey එකට save කරන්න එපා.
+
+
+            addBotMessage(
+                reply
+            )
+
+            return
+        }
+
+
+        // =========================================
+        // NORMAL NLP FLOW
+        // =========================================
+
+        val stressScore =
+            response.stressScore
+
+
+        // Journey history
+        saveStressScoreToJourney(
+            stressScore
+        )
+
+
+        // SharedPreferences
+        requireContext()
+            .getSharedPreferences(
+                "MindMatePrefs",
+                Context.MODE_PRIVATE
+            )
+            .edit()
+            .putInt(
+                "LAST_STRESS_SCORE",
+                stressScore
+            )
+            .putString(
+                "LAST_INTENT",
+                response.intent
+            )
+            .putString(
+                "LAST_EMOTION",
+                response.emotion
+            )
+            .putString(
+                "LAST_STRESS_LEVEL",
+                response.stressLevel
+            )
+            .apply()
+
+
+        // Robot mood
+        updateAvatarAndMood(
+            stressScore
+        )
+
+
+        // Bot reply
+        addBotMessage(
+            reply
+        )
+
+
+        // Backend recommendation
+        handleBackendActivitySuggestion(
+            recommendedActivity
+        )
+    }
+
+    private fun handleBackendActivitySuggestion(
+        recommendedActivity: String
+    ) {
+
+        // Reset previous suggestion cards
+        cardGameSuggestion.visibility =
+            View.GONE
+
+        cardSupportActivity.visibility =
+            View.GONE
+
+
+        when (
+            recommendedActivity.uppercase()
+        ) {
+
+            // =====================================
+            // CALM BUBBLES
+            // =====================================
+
+            "CALM_BUBBLES" -> {
+
+                suggestedGameType =
+                    "CALM_BUBBLES"
+
+                tvGameSuggestion.text =
+                    "Would you like a short 60-second supportive break with Calm Bubbles?"
+
+                btnPlaySuggestedGame.text =
+                    "🫧 Calm Bubbles"
+
+                cardGameSuggestion.visibility =
+                    View.VISIBLE
+            }
+
+
+            // =====================================
+            // MANDALA
+            // =====================================
+
+            "MANDALA" -> {
+
+                val prefs =
+                    requireContext()
+                        .getSharedPreferences(
+                            "MindMatePrefs",
+                            Context.MODE_PRIVATE
+                        )
+
+
+                val status =
+                    prefs.getString(
+                        "MANDALA_LAST_STATUS",
+                        ""
+                    ) ?: ""
+
+
+                val level =
+                    prefs.getInt(
+                        "MANDALA_LAST_LEVEL",
+                        1
+                    )
+
+
+                val percent =
+                    prefs.getInt(
+                        "MANDALA_LAST_PERCENT",
+                        0
+                    )
+
+
+                suggestedGameType =
+                    "MANDALA"
+
+
+                // Resume incomplete level
+                if (
+                    status == "PAUSED"
+                    &&
+                    percent in 1..99
+                ) {
+
+                    suggestedMandalaLevel =
+                        level
+
+                    tvGameSuggestion.text =
+                        "Your Mandala Flow progress is saved 🌸\n" +
+                                "Level $level • $percent% complete."
+
+                    btnPlaySuggestedGame.text =
+                        "🌸 Continue Level $level"
+                }
+
+                // Start next unlocked level
+                else if (
+                    status == "COMPLETED"
+                    &&
+                    level < 6
+                ) {
+
+                    val nextLevel =
+                        level + 1
+
+                    suggestedMandalaLevel =
+                        nextLevel
+
+                    tvGameSuggestion.text =
+                        "Mandala Flow Level $nextLevel is ready ✨"
+
+                    btnPlaySuggestedGame.text =
+                        "🌸 Start Level $nextLevel"
+                }
+
+                // First/default Mandala
+                else {
+
+                    suggestedMandalaLevel =
+                        1
+
+                    tvGameSuggestion.text =
+                        "Would you like a short 2-minute Mandala Paint Flow break?"
+
+                    btnPlaySuggestedGame.text =
+                        "🌸 Mandala Paint Flow"
+                }
+
+
+                cardGameSuggestion.visibility =
+                    View.VISIBLE
+            }
+
+
+            // =====================================
+            // BREATHING
+            // =====================================
+
+            "BREATHING" -> {
+
+                cardSupportActivity.visibility =
+                    View.VISIBLE
+            }
+
+
+            // =====================================
+            // GROUNDING
+            // =====================================
+
+            "GROUNDING" -> {
+
+                cardSupportActivity.visibility =
+                    View.VISIBLE
+            }
+
+
+            // =====================================
+            // NONE
+            // =====================================
+
+            else -> {
+
+                cardGameSuggestion.visibility =
+                    View.GONE
+
+                cardSupportActivity.visibility =
+                    View.GONE
+            }
+        }
     }
 
 
