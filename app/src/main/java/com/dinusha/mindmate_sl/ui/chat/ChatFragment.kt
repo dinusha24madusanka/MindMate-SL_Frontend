@@ -111,12 +111,11 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 val request = ChatRequest(messageText)
                 RetrofitClient.getApiService().sendChatMessage(request).enqueue(object : Callback<ChatResponse> {
                     override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
+                        Log.d("CHAT_DEBUG", "CODE = ${response.code()}")
+                        Log.d("CHAT_DEBUG", "BODY = ${response.body()}")
+
                         if (response.isSuccessful && response.body() != null) {
-
-                            val body = response.body()!!
-
-                            handleHybridResponse(body)
-
+                            handleHybridResponse(response.body()!!)
                         } else {
                             receiveBotResponse("Server error, please try again later.", 50)
                         }
@@ -151,6 +150,11 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     intent.putExtra(
                         GameWebViewActivity.EXTRA_URL,
                         "file:///android_asset/games/mandala_paint_flow.html"
+                    )
+
+                    intent.putExtra(
+                        "MANDALA_LEVEL",
+                        suggestedMandalaLevel
                     )
                 }
 
@@ -300,19 +304,14 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         GameWebViewActivity.RESULT_POINTS,
                         0
                     ) ?: 0
-
                 if (gameId.isNotEmpty()) {
-
                     if (
-                        gameId ==
-                        "mandala_paint_flow"
+                        gameId == "mandala_paint_flow"
                     ) {
-
                         val status =
                             data?.getStringExtra(
                                 GameWebViewActivity.RESULT_GAME_STATUS
                             ) ?: "PAUSED"
-
 
                         val mandalaLevel =
                             data?.getIntExtra(
@@ -320,23 +319,18 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                                 1
                             ) ?: 1
 
-
                         val mandalaPercent =
                             data?.getIntExtra(
                                 GameWebViewActivity.RESULT_MANDALA_PERCENT,
                                 0
                             ) ?: 0
-
-
                         onMandalaSessionReturned(
                             status,
                             mandalaLevel,
                             mandalaPercent,
                             points
                         )
-
                     } else {
-
                         onMiniGameCompleted(
                             gameId,
                             score,
@@ -908,7 +902,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         cardGameSuggestion.visibility =
             View.VISIBLE
     }
-
     private fun onMandalaSessionReturned(
         status: String,
         level: Int,

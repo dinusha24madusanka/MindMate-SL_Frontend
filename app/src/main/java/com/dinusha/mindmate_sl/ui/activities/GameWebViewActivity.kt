@@ -52,37 +52,27 @@ class GameWebViewActivity : AppCompatActivity() {
             intent.getStringExtra(
                 EXTRA_TITLE
             ) ?: "MindMate Game"
-
-
         val gameUrl =
             intent.getStringExtra(
                 EXTRA_URL
             )
                 ?: "file:///android_asset/games/calm_bubbles.html"
-
-
-        toolbar.title =
-            gameTitle
-
+        val mandalaLevel =
+            intent.getIntExtra(
+                "MANDALA_LEVEL",
+                1
+            )
+        toolbar.title = gameTitle
 
         toolbar.setNavigationOnClickListener {
-
             showExitConfirmation()
         }
-
-
         webView.settings.apply {
-
             javaScriptEnabled = true
-
             domStorageEnabled = true
-
             loadWithOverviewMode = true
-
             useWideViewPort = true
         }
-
-
         /*
          * JavaScript → Android bridge
          */
@@ -124,6 +114,23 @@ class GameWebViewActivity : AppCompatActivity() {
         webView.loadUrl(
             gameUrl
         )
+
+        if (
+            gameUrl.contains("mandala_paint_flow")
+        ) {
+
+            webView.evaluateJavascript(
+                """
+        localStorage.setItem(
+            "MANDALA_START_LEVEL",
+            "$mandalaLevel"
+        );
+        """.trimIndent(),
+                null
+            )
+        }
+
+        webView.loadUrl(gameUrl)
 
 
         onBackPressedDispatcher
@@ -168,10 +175,7 @@ class GameWebViewActivity : AppCompatActivity() {
                     finalDuration
                 )
             }
-        }
-
-
-        /*
+        }        /*
          * Mandala exact progress save
          */
         @JavascriptInterface
@@ -723,105 +727,67 @@ class GameWebViewActivity : AppCompatActivity() {
 
             .show()
     }
-
-
     private fun showExitConfirmation() {
-
         /*
          * Once the game is already completed,
          * simply return to Activities.
          */
         if (resultHandled) {
-
             finish()
-
             return
         }
-
-
         AlertDialog.Builder(this)
-
             .setTitle(
                 "Leave this activity?"
             )
-
             .setMessage(
                 "Your current mini-game session will not count as completed."
             )
-
             .setPositiveButton(
                 "Leave"
             ) { _, _ ->
-
                 finish()
             }
-
             .setNegativeButton(
                 "Keep Playing",
                 null
             )
-
             .show()
     }
-
-
     override fun onDestroy() {
-
         webView.apply {
-
             stopLoading()
-
             removeJavascriptInterface(
                 "Android"
             )
-
             clearHistory()
-
             removeAllViews()
-
             destroy()
         }
-
         super.onDestroy()
     }
-
-
     companion object {
-
         const val EXTRA_TITLE =
             "game_title"
-
         const val EXTRA_URL =
             "game_url"
-
         const val RESULT_GAME_ID =
             "result_game_id"
-
         const val RESULT_GAME_SCORE =
             "result_game_score"
-
         const val RESULT_GAME_DURATION =
             "result_game_duration"
-
         const val RESULT_POINTS =
             "result_points"
-
         //Mandala
         const val MANDALA_PROGRESS_KEY =
             "MANDALA_PAINT_PROGRESS_JSON"
-
-
         const val RESULT_GAME_STATUS =
             "result_game_status"
-
-
         const val RESULT_MANDALA_LEVEL =
             "result_mandala_level"
-
-
         const val RESULT_MANDALA_PERCENT =
             "result_mandala_percent"
-
         const val MANDALA_LEVEL_REWARD =
             10
     }
