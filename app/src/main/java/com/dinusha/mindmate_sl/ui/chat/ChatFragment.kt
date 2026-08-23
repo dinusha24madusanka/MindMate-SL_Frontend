@@ -29,6 +29,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.dinusha.mindmate_sl.ui.activities.BreathingExerciseActivity
 import com.dinusha.mindmate_sl.ui.activities.GroundingExerciseActivity
 import kotlin.math.roundToInt
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import com.dinusha.mindmate_sl.data.firebase.FirebaseRepository
+
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     // Views
@@ -109,62 +114,130 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
                 // API Request එක යැවීම
                 val request = ChatRequest(messageText)
-                RetrofitClient.getApiService().sendChatMessage(request).enqueue(object : Callback<ChatResponse> {
-                    override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
-                        Log.d("CHAT_DEBUG", "CODE = ${response.code()}")
-                        Log.d("CHAT_DEBUG", "BODY = ${response.body()}")
+                RetrofitClient.getApiService()
+                    .sendChatMessage(request)
+                    .enqueue(object : Callback<ChatResponse> {
+                        override fun onResponse(
+                            call: Call<ChatResponse>,
+                            response: Response<ChatResponse>
+                        ) {
+                            if (
+                                !isAdded ||
+                                this@ChatFragment.view == null
+                            ) {
+                                return
+                            }
+                            if (
+                                response.isSuccessful &&
+                                response.body() != null
+                            ) {
 
-                        if (response.isSuccessful && response.body() != null) {
-                            handleHybridResponse(response.body()!!)
-                        } else {
-                            receiveBotResponse("Server error, please try again later.", 50)
+                                handleHybridResponse(
+                                    response.body()!!
+                                )
+                                return
+                            }
+
+                            // Keep technical details in Logcat only.
+                            Log.e(
+                                "ChatFragment",
+                                "API HTTP error: ${response.code()}"
+                            )
+                            val userMessage =
+                                when (response.code()) {
+                                    408,
+                                    504 -> {
+                                        "MindMate is taking longer than expected to respond. " +
+                                                "Please try again in a moment."
+                                    }
+                                    429 -> {
+                                        "MindMate is a little busy right now. " +
+                                                "Please wait a moment and try again."
+                                    }
+                                    in 500..599 -> {
+                                        "MindMate is temporarily unavailable. " +
+                                                "Please try again shortly."
+                                    }
+                                    else -> {
+                                        "I couldn't process that message right now. " +
+                                                "Please try again."
+                                    }
+                                }
+                            showApiErrorMessage(
+                                userMessage
+                            )
                         }
-                    }
+                        override fun onFailure(
+                            call: Call<ChatResponse>,
+                            t: Throwable
+                        ) {
 
-                    override fun onFailure(call: Call<ChatResponse>, t: Throwable) {
-                        receiveBotResponse("Error: ${t.message}", 50)
-                    }
-                })
+                            if (
+                                !isAdded ||
+                                this@ChatFragment.view == null
+                            ) {
+                                return
+                            }
+
+                            // Developer/debug information only.
+                            // Never show t.message directly to the user.
+                            Log.e(
+                                "ChatFragment",
+                                "API request failed",
+                                t
+                            )
+
+                            val userMessage =
+                                when (t) {
+                                    is SocketTimeoutException -> {
+                                        "MindMate is taking longer than expected to respond. " +
+                                                "Please try again in a moment."
+                                    }
+                                    is UnknownHostException,
+                                    is ConnectException -> {
+                                        "MindMate can't connect to the service right now. " +
+                                                "Please check your internet connection and try again."
+                                    }
+                                    else -> {
+                                        "MindMate couldn't reach the service right now. " +
+                                                "Please check your connection and try again."
+                                    }
+                                }
+                            showApiErrorMessage(
+                                userMessage
+                            )
+                        }
+                    })
             }
         }
 
         btnPlaySuggestedGame.setOnClickListener {
-
             cardGameSuggestion.visibility = View.GONE
-
             val intent =
                 Intent(
                     requireContext(),
                     GameWebViewActivity::class.java
                 )
-
             when (suggestedGameType) {
-
                 "MANDALA" -> {
-
                     intent.putExtra(
                         GameWebViewActivity.EXTRA_TITLE,
                         "Mandala Paint Flow"
                     )
-
                     intent.putExtra(
                         GameWebViewActivity.EXTRA_URL,
                         "file:///android_asset/games/mandala_paint_flow.html"
                     )
-
                     intent.putExtra(
                         "MANDALA_LEVEL",
                         suggestedMandalaLevel
                     )
                 }
-
                 else -> {
-
                     intent.putExtra(
                         GameWebViewActivity.EXTRA_TITLE,
                         "Calm Bubbles"
                     )
-
                     intent.putExtra(
                         GameWebViewActivity.EXTRA_URL,
                         "file:///android_asset/games/calm_bubbles.html"
@@ -176,51 +249,35 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         }
 
         btnSuggestedBreathing.setOnClickListener {
-
-            cardSupportActivity.visibility =
-                View.GONE
-
+            cardSupportActivity.visibility =View.GONE
             val intent =
                 Intent(
                     requireContext(),
                     BreathingExerciseActivity::class.java
                 )
-
             supportActivityLauncher.launch(intent)
         }
-
         btnSuggestedGrounding.setOnClickListener {
-
-            cardSupportActivity.visibility =
-                View.GONE
-
+            cardSupportActivity.visibility = View.GONE
             val intent =
                 Intent(
                     requireContext(),
                     GroundingExerciseActivity::class.java
                 )
-
             supportActivityLauncher.launch(intent)
         }
-
         btnDismissGame.setOnClickListener {
-
-            cardGameSuggestion.visibility =
-                View.GONE
-
+            cardGameSuggestion.visibility = View.GONE
             addBotMessage(
                 "No problem 🌿 We can keep chatting."
             )
         }
 
         btnFeelingBetter.setOnClickListener {
-
             saveActivityFeedback(
                 "BETTER"
             )
-
-            cardFeelingCheck.visibility =
-                View.GONE
+            cardFeelingCheck.visibility = View.GONE
 
             addBotMessage(
                 "I'm glad the short break felt helpful 🌿 Whenever you're ready, we can keep chatting."
@@ -229,14 +286,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
 
         btnFeelingSame.setOnClickListener {
-
             saveActivityFeedback(
                 "SAME"
             )
-
-            cardFeelingCheck.visibility =
-                View.GONE
-
+            cardFeelingCheck.visibility = View.GONE
             addBotMessage(
                 "That's okay 🌿 A short break doesn't always change how we feel immediately. We can keep chatting or try another activity."
             )
@@ -422,10 +475,33 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val selectedAvatarId = sharedPreferences.getString("SELECTED_AVATAR_ID", "bot_gizmo") ?: "bot_gizmo"
 
         val (mood, backgroundColorHex) = when (stressLevel) {
-            in 0..30 -> Pair("happy", "#E0F2F1")
-            in 31..70 -> Pair("neutral", "#FFF9C4")
-            in 71..100 -> Pair("sad", "#FFCDD2")
-            else -> Pair("neutral", "#F5F5F5")
+
+            // Backend LOW
+            in 0..49 ->
+                Pair(
+                    "happy",
+                    "#E0F2F1"
+                )
+
+            // Backend MODERATE
+            in 50..74 ->
+                Pair(
+                    "neutral",
+                    "#FFF9C4"
+                )
+
+            // Backend HIGH
+            in 75..100 ->
+                Pair(
+                    "sad",
+                    "#FFCDD2"
+                )
+
+            else ->
+                Pair(
+                    "neutral",
+                    "#F5F5F5"
+                )
         }
 
         val avatarPrefix = when (selectedAvatarId) {
@@ -517,15 +593,26 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         }
 
 
-        // =========================================
-        // NORMAL NLP FLOW
-        // =========================================
-
         val stressScore =
             response.stressScore
 
 
-        // Journey history
+// =========================================
+// FIREBASE STRESS HISTORY
+// =========================================
+
+        FirebaseRepository.saveStressHistory(
+            stressScore = stressScore,
+            stressLevel = response.stressLevel ?: "UNKNOWN",
+            emotion = response.emotion ?: "UNKNOWN",
+            intent = response.intent ?: "UNKNOWN"
+        )
+
+
+// =========================================
+// LOCAL JOURNEY HISTORY
+// =========================================
+
         saveStressScoreToJourney(
             stressScore
         )
@@ -749,20 +836,36 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
      * රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම
      */
     private fun addBotMessage(message: String) {
-
         messageList.add(
             ChatMessage(
                 message,
                 isUser = false
             )
         )
-
         chatAdapter.notifyItemInserted(
             messageList.size - 1
         )
-
         rvChatMessages.scrollToPosition(
             messageList.size - 1
+        )
+    }
+
+    private fun showApiErrorMessage(
+        message: String
+    ) {
+        // API/network failure ekak userge
+        // mental-health/stress result ekak nemei.
+        // Therefore:
+        // - no fake stress score
+        // - no Journey save
+        // - no avatar mood change
+        // - no activity/game recommendation
+
+        cardGameSuggestion.visibility = View.GONE
+        cardSupportActivity.visibility = View.GONE
+        cardFeelingCheck.visibility = View.GONE
+        addBotMessage(
+            message
         )
     }
 

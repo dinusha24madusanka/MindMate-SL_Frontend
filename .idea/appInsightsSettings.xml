@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.dinusha.mindmate_sl" />
+                  <option name="mobileSdkAppId" value="1:452462250924:android:bac1c0f68ebe51f78fc809" />
+                  <option name="projectId" value="mindmate-sl-1c8b0" />
+                  <option name="projectNumber" value="452462250924" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
