@@ -25,113 +25,42 @@ class GameWebViewActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-
-        setContentView(
-            R.layout.activity_game_webview
-        )
-
-        val toolbar =
-            findViewById<MaterialToolbar>(
-                R.id.gameToolbar
-            )
-
-        webView =
-            findViewById(
-                R.id.gameWebView
-            )
-
-        progressBar =
-            findViewById(
-                R.id.gameProgressBar
-            )
-
-
-        val gameTitle =
-            intent.getStringExtra(
-                EXTRA_TITLE
-            ) ?: "MindMate Game"
-        val gameUrl =
-            intent.getStringExtra(
-                EXTRA_URL
-            )
-                ?: "file:///android_asset/games/calm_bubbles.html"
-        val mandalaLevel =
-            intent.getIntExtra(
-                "MANDALA_LEVEL",
-                1
-            )
+        setContentView(R.layout.activity_game_webview)
+        val toolbar = findViewById<MaterialToolbar>(R.id.gameToolbar)
+        webView = findViewById(R.id.gameWebView)
+        progressBar = findViewById(R.id.gameProgressBar)
+        val gameTitle = intent.getStringExtra(EXTRA_TITLE) ?: "MindMate Game"
+        val gameUrl =intent.getStringExtra(EXTRA_URL) ?: "file:///android_asset/games/calm_bubbles.html"
         toolbar.title = gameTitle
-
-        toolbar.setNavigationOnClickListener {
-            showExitConfirmation()
-        }
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
         }
-        /*
-         * JavaScript → Android bridge
-         */
         webView.addJavascriptInterface(
             GameBridge(),
             "Android"
         )
-
-
         webView.webViewClient =
             WebViewClient()
-
-
         webView.webChromeClient =
             object : WebChromeClient() {
-
                 override fun onProgressChanged(
                     view: WebView?,
                     newProgress: Int
                 ) {
-
-                    progressBar.progress =
-                        newProgress
-
-
+                    progressBar.progress = newProgress
                     progressBar.visibility =
                         if (newProgress < 100) {
-
                             View.VISIBLE
-
                         } else {
-
                             View.GONE
                         }
                 }
             }
-
-
-        webView.loadUrl(
-            gameUrl
-        )
-
-        if (
-            gameUrl.contains("mandala_paint_flow")
-        ) {
-
-            webView.evaluateJavascript(
-                """
-        localStorage.setItem(
-            "MANDALA_START_LEVEL",
-            "$mandalaLevel"
-        );
-        """.trimIndent(),
-                null
-            )
-        }
-
         webView.loadUrl(gameUrl)
-
 
         onBackPressedDispatcher
             .addCallback(
@@ -727,31 +656,107 @@ class GameWebViewActivity : AppCompatActivity() {
 
             .show()
     }
+
+    private fun leaveGameSafely() {
+
+        if (resultHandled) {
+            finish()
+            return
+        }
+
+        val currentUrl =
+            webView.url.orEmpty()
+
+        if (
+            currentUrl.contains(
+                "mandala_paint_flow"
+            )
+        ) {
+
+            /*
+             * Ask the Mandala HTML to save its exact state
+             * and return PAUSED result through the Android bridge.
+             *
+             * Do NOT call finish() here.
+             * handleMandalaSessionEnded() will finish the Activity
+             * after the result has been prepared for ChatFragment.
+             */
+            webView.evaluateJavascript(
+                """
+            (function () {
+
+                if (
+                    typeof returnPausedToMindMate === "function"
+                ) {
+
+                    returnPausedToMindMate();
+                    return "HANDLED";
+                }
+
+                return "NOT_FOUND";
+
+            })();
+            """.trimIndent()
+            ) { result ->
+
+                /*
+                 * Defensive fallback only.
+                 * If the HTML function was unavailable,
+                 * avoid trapping the user inside the activity.
+                 */
+                if (
+                    result.contains(
+                        "NOT_FOUND"
+                    ) &&
+                    !resultHandled
+                ) {
+
+                    runOnUiThread {
+                        finish()
+                    }
+                }
+            }
+
+            return
+        }
+
+        // Other mini-games keep the normal exit behaviour.
+        finish()
+    }
+
     private fun showExitConfirmation() {
+
         /*
-         * Once the game is already completed,
-         * simply return to Activities.
+         * Once the result has already been handled,
+         * simply close the activity.
          */
         if (resultHandled) {
             finish()
             return
         }
+
         AlertDialog.Builder(this)
+
             .setTitle(
                 "Leave this activity?"
             )
+
             .setMessage(
-                "Your current mini-game session will not count as completed."
+                "Your progress will be saved before you leave."
             )
+
             .setPositiveButton(
                 "Leave"
             ) { _, _ ->
-                finish()
+
+                leaveGameSafely()
             }
+
             .setNegativeButton(
                 "Keep Playing",
                 null
             )
+
             .show()
     }
     override fun onDestroy() {
@@ -771,6 +776,8 @@ class GameWebViewActivity : AppCompatActivity() {
             "game_title"
         const val EXTRA_URL =
             "game_url"
+        const val EXTRA_MANDALA_LEVEL =
+            "MANDALA_LEVEL"
         const val RESULT_GAME_ID =
             "result_game_id"
         const val RESULT_GAME_SCORE =

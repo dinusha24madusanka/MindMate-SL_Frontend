@@ -229,7 +229,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         "file:///android_asset/games/mandala_paint_flow.html"
                     )
                     intent.putExtra(
-                        "MANDALA_LEVEL",
+                        GameWebViewActivity.EXTRA_MANDALA_LEVEL,
                         suggestedMandalaLevel
                     )
                 }
