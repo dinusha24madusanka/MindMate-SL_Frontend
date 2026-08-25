@@ -6,7 +6,7 @@
   <title>Mandala Paint Flow</title>
   <style>
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-    :root{
+    :root{let resultSent = false;
       --ink:#073f3a;
       --ink2:#0b5c54;
       --muted:#6d8581;
@@ -343,7 +343,7 @@
   let dragColor = null;
   let lastPaintedThisStroke = new Set();
   let undoStack = [];
-  let resultSent = false;
+  let completionPoints = 0;
 
   /*
    * Reward returned by Android for the most recently completed level.
@@ -511,20 +511,56 @@
     continueIcon.textContent=cfg.icon;
     continueName.textContent=`Level ${currentLevel} · ${cfg.name}`;
 
-    if(state.levels[currentLevel].completed){
-      continueLabel.textContent="READY FOR YOUR NEXT MANDALA";
-      continueProgress.textContent=currentLevel<6?"Previous level completed · next challenge ready":"All 6 levels completed ✨";
-      continueBtn.textContent=currentLevel<6?`Start Level ${Math.min(6,currentLevel+1)}`:"Replay Level 6";
-      continueMiniBar.style.width="100%";
-    }else if(p.done>0){
-      continueLabel.textContent="CONTINUE YOUR CURRENT LEVEL";
-      continueProgress.textContent=`${p.percent}% complete · ${p.done} of ${p.total} cells`;
-      continueBtn.textContent=`Continue Level ${currentLevel}`;
-      continueMiniBar.style.width=p.percent+"%";
-    }else{
-      continueLabel.textContent="YOUR CURRENT LEVEL";
-      continueProgress.textContent="Ready for a gentle 2-minute session";
-      continueBtn.textContent=`Start Level ${currentLevel}`;
+    if(
+    state.levels[currentLevel].completed &&
+    p.percent < 100
+){
+
+    continueLabel.textContent="REPLAY IN PROGRESS";
+
+    continueProgress.textContent=
+        `${p.percent}% replay complete · ${p.done} of ${p.total} cells`;
+
+    continueBtn.textContent=
+        `Continue Level ${currentLevel}`;
+
+}else if(state.levels[currentLevel].completed){
+
+    continueLabel.textContent=
+        "READY FOR YOUR NEXT MANDALA";
+
+    continueProgress.textContent=
+        currentLevel < 6
+            ? "Previous level completed"
+            : "All 6 levels completed";
+
+    continueBtn.textContent=
+        currentLevel < 6
+            ? `Start Level ${Math.min(6,currentLevel+1)}`
+            : "Replay Level 6";
+
+}else if(p.done>0){
+
+    continueLabel.textContent=
+        "CONTINUE YOUR CURRENT LEVEL";
+
+    continueProgress.textContent=
+        `${p.percent}% complete · ${p.done} of ${p.total} cells`;
+
+    continueBtn.textContent=
+        `Continue Level ${currentLevel}`;
+
+}else{
+
+    continueLabel.textContent=
+        "YOUR CURRENT LEVEL";
+
+    continueProgress.textContent=
+        "Ready for a gentle 2-minute session";
+
+    continueBtn.textContent=
+        `Start Level ${currentLevel}`;
+}
       continueMiniBar.style.width="0%";
     }
 
@@ -537,7 +573,17 @@
       const card=document.createElement("button");
       card.className="levelCard"+(!unlocked?" locked":"")+(cfg.level===currentLevel?" current":"");
       card.disabled=!unlocked;
-      card.onclick=()=>openLevel(cfg.level);
+      card.onclick=()=>{
+
+  // Fully completed level → start a fresh replay.
+  if(completed && p.percent === 100){
+    startReplay(cfg.level);
+    return;
+  }
+
+  // New level / paused replay → resume normally.
+  openLevel(cfg.level);
+};
 
       let badge="";
       if(completed) badge="✓ COMPLETE";
@@ -561,41 +607,49 @@
   }
 
   function continueCurrent(){
-    let level=state.currentLevel;
-    if(state.levels[level].completed && level<6) level=Math.min(6,level+1);
+
+    let level = state.currentLevel;
+
+    const p = getLevelProgress(level);
+
+    const completed =
+        state.levels[level].completed;
+
+    // Partial replay → continue same replay
+    if(completed && p.percent < 100){
+        openLevel(level);
+        return;
+    }
+
+    // Finished level 1–5 → move to next level
+    if(completed && p.percent === 100 && level < 6){
+        openLevel(level + 1);
+        return;
+    }
+
+    // Finished level 6 → fresh replay
+    if(completed && p.percent === 100 && level === 6){
+        startReplay(6);
+        return;
+    }
+
     openLevel(level);
-  }
+}
 
-  function openLevel(level){
-    if(level>state.unlockedLevel) return;
-    currentLevel=level;
-    state.currentLevel=level;
-    saveState();
+  function startReplay(level){
 
-    targetCells=generateCells(level);
-    selectedColor=0;
-    undoStack=[];
-    resultSent=false;
-    lastCompletionPoints=0;
-    sessionLeft=SESSION_SECONDS;
+  if(level > state.unlockedLevel) return;
 
-    const cfg=levelConfig(level);
-    gameTitle.textContent=`Level ${level} · ${cfg.name}`;
-    gameMeta.textContent=`${cfg.cellsText} · progress saves automatically`;
+  // Clear only the painted cells.
+  // Keep completed=true so original achievement is preserved.
+  state.levels[level].painted = {};
 
-    buildBoard();
-    buildPalette();
-    updateProgress();
-    updateTimer();
+  state.currentLevel = level;
 
-    homeScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
-    sessionOverlay.classList.add("hidden");
-    levelOverlay.classList.add("hidden");
+  saveState();
 
-    startSessionTimer();
-    window.scrollTo(0,0);
-  }
+  openLevel(level);
+}
 
   function buildBoard(){
     const cfg=levelConfig(currentLevel),n=cfg.grid;
@@ -817,100 +871,80 @@
   }
 
   function completeLevel(){
+
     clearInterval(sessionTimer);
 
-    const completedLevel=currentLevel;
-    const cfg=levelConfig(completedLevel);
+    const lvl =
+        state.levels[currentLevel];
 
-    /*
-     * Actual time spent in the current 120-second session.
-     */
-    const elapsedSeconds=
-      Math.max(
-        1,
-        SESSION_SECONDS-sessionLeft
-      );
+    // Was this level completed previously?
+    const firstCompletion =
+        !lvl.completed;
 
-    const lvl=state.levels[completedLevel];
-    lvl.completed=true;
-    lvl.bestPercent=100;
+    completionPoints =
+        firstCompletion ? 10 : 0;
 
-    if(completedLevel<6){
-      state.unlockedLevel=
-        Math.max(
-          state.unlockedLevel,
-          completedLevel+1
-        );
+    lvl.completed = true;
+    lvl.bestPercent = 100;
 
-      state.currentLevel=
-        completedLevel+1;
+    if(firstCompletion){
+
+        if(currentLevel < 6){
+
+            state.unlockedLevel =
+                Math.max(
+                    state.unlockedLevel,
+                    currentLevel + 1
+                );
+
+            state.currentLevel =
+                currentLevel + 1;
+
+        }else{
+
+            state.currentLevel = 6;
+        }
+
     }else{
-      state.currentLevel=6;
+
+        // Replay completed.
+        // Do not alter unlock progression.
+        state.currentLevel = currentLevel;
     }
 
-    /*
-     * Save coloring and next-level unlock first.
-     */
     saveState();
 
-    /*
-     * PRIORITY #2 FIX:
-     * Award +10 immediately when this level reaches 100%.
-     * Therefore tapping "Next Level" cannot lose the reward.
-     */
-    lastCompletionPoints=0;
+    const cfg =
+        levelConfig(currentLevel);
 
-    try{
-      if(
-        typeof Android!=="undefined" &&
-        typeof Android.mandalaLevelCompleted==="function"
-      ){
-        const awarded=
-          Android.mandalaLevelCompleted(
-            String(completedLevel),
-            String(elapsedSeconds)
-          );
+    if(firstCompletion){
 
-        const parsed=Number(awarded);
+        levelText.innerHTML =
+            `You completed <strong>Level ${currentLevel} · ${cfg.name}</strong>.<br><br>
+             +10 MindPoints<br>
+             ${
+                currentLevel < 6
+                    ? `Level ${currentLevel + 1} is now unlocked 🔓`
+                    : "You completed all 6 Mandala levels ✨"
+             }`;
 
-        lastCompletionPoints=
-          Number.isFinite(parsed)
-            ? parsed
-            : 0;
-      }
-    }catch(e){
-      console.log(
-        "Mandala level reward bridge error:",
-        e
-      );
+    }else{
+
+        levelText.innerHTML =
+            `You completed the <strong>Level ${currentLevel} · ${cfg.name}</strong> replay.<br><br>
+             Replay complete 🌸<br>
+             No additional MindPoints are awarded for replaying a completed level.`;
     }
 
-    const rewardLine=
-      lastCompletionPoints>0
-        ? `+${lastCompletionPoints} MindPoints`
-        : `Reward already collected`;
+    nextLevelBtn.style.display =
+        currentLevel < 6
+            ? "block"
+            : "none";
 
-    levelText.innerHTML=
-      `You completed <strong>Level ${completedLevel} · ${cfg.name}</strong>.` +
-      `<br><br><strong>${rewardLine}</strong><br>` +
-      `${completedLevel<6
-          ? `Level ${completedLevel+1} is now unlocked 🔓`
-          : "You completed all 6 Mandala levels ✨"}`;
-
-    nextLevelBtn.style.display=
-      completedLevel<6
-        ? "block"
-        : "none";
-
-    /*
-     * state.currentLevel already points to the next level,
-     * so preserve the level that actually completed.
-     */
-    levelOverlay.dataset.completedLevel=
-      String(completedLevel);
-
-    levelOverlay.classList.remove("hidden");
-  }
+    levelOverlay.classList.remove(
+        "hidden"
+    );
+}
 
   function startNextLevel(){
     const completedLevel=
@@ -935,19 +969,13 @@
   }
 
   function returnCompletedToMindMate(){
-    const completedLevel=
-      Number(
-        levelOverlay.dataset.completedLevel
-        || currentLevel
-      );
 
     notifySessionEnd(
-      "COMPLETED",
-      lastCompletionPoints,
-      100,
-      completedLevel
+        "COMPLETED",
+        completionPoints,
+        100
     );
-  }
+}
 
   function notifySessionEnd(
     status,

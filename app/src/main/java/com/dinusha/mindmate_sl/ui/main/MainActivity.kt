@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import com.dinusha.mindmate_sl.R
 import com.dinusha.mindmate_sl.ui.activities.ActivitiesFragment
 import com.dinusha.mindmate_sl.ui.chat.ChatFragment
-import com.dinusha.mindmate_sl.ui.community.CommunityFragment
 import com.dinusha.mindmate_sl.ui.journey.JourneyFragment
 import com.dinusha.mindmate_sl.ui.profile.ProfileFragment
 
@@ -71,9 +70,6 @@ class MainActivity : AppCompatActivity() {
                     R.id.nav_activities ->
                         ActivitiesFragment()
 
-                    R.id.nav_community ->
-                        CommunityFragment()
-
                     R.id.nav_profile ->
                         ProfileFragment()
 
@@ -118,22 +114,16 @@ class MainActivity : AppCompatActivity() {
 
             return
         }
-
-
         // First-time anonymous sign-in
         firebaseAuth
             .signInAnonymously()
             .addOnCompleteListener(this) { task ->
-
                 if (task.isSuccessful) {
-
                     Log.d(
                         "FirebaseAuth",
                         "Anonymous Firebase sign-in successful"
                     )
-
                 } else {
-
                     Log.e(
                         "FirebaseAuth",
                         "Anonymous Firebase sign-in failed",

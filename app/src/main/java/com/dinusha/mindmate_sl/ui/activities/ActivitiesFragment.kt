@@ -55,107 +55,65 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
 
         // මොඩල් එකේ අගය අනුව නිර්දේශය වෙනස් කිරීම
         when (currentStressScore) {
-            in 0..30 -> {
-                tvStressStateTitle.text = "Perfectly Relaxed"
-                tvStressStateDesc.text = "Your mental state is excellent! Keep maintaining this balance with light activities."
+
+            in 0..49 -> {
+                tvStressStateTitle.text = "Recent Stress: Low"
+                tvStressStateDesc.text = "Your recent AI-derived stress score is in the low range. You can choose a light activity if you would like a short break."
             }
-            in 31..70 -> {
-                tvStressStateTitle.text = "Slightly Stressed"
-                tvStressStateDesc.text = "Based on your recent chats, we recommend a 5-minute casual gaming break to lower cortisol levels."
+
+            in 50..74 -> {
+                tvStressStateTitle.text = "Recent Stress: Moderate"
+                tvStressStateDesc.text = "Your recent AI-derived stress score is in the moderate range. Calm Bubbles is available as a short supportive break."
             }
+
             else -> {
-                tvStressStateTitle.text = "Highly Stressed"
-                tvStressStateDesc.text = "Deep breathing exercises and alpha waves are highly recommended to calm your nervous system right now."
+                tvStressStateTitle.text = "Recent Stress: High"
+                tvStressStateDesc.text = "Your recent AI-derived stress score is in the high range. Mandala Paint Flow is available as a short structured activity."
             }
         }
     }
 
     private fun setupGamesRecyclerView() {
-
         val gamesList = listOf(
-
             GameItem(
-                "Calm Bubbles",
-                "A short focus game for a quick mental break.",
-                "2–5 Mins",
-                R.drawable.calm_bubbles_cover,
-                "file:///android_asset/games/calm_bubbles.html"
+                title = "Calm Bubbles",
+                description = "A short focus game for a quick mental break.",
+                durationText = "2 Mins",
+                imageResId = R.drawable.calm_bubbles_cover,
+                webUrl = "file:///android_asset/games/calm_bubbles.html"
             ),
-
             GameItem(
-                "Mandala Paint Flow",
-                "A relaxing 2-minute color-by-number mandala activity.",
-                "2 Mins",
-                R.drawable.ic_activities,
-                "file:///android_asset/games/mandala_paint_flow.html"
-            ),
-
-            GameItem(
-                "Focus Flight",
-                "A light attention game.",
-                "5 Mins",
-                R.drawable.ic_activities,
-                ""
+                title = "Mandala Paint Flow",
+                description = "A short mindful coloring activity.",
+                durationText = "3 Mins",
+                imageResId = R.drawable.ic_activities,
+                webUrl = "file:///android_asset/games/mandala_paint_flow.html"
             )
         )
 
-        val gamesAdapter =
-            GamesAdapter(gamesList) { game ->
-
-                if (game.webUrl.isBlank()) {
-
-                    Toast.makeText(
-                        requireContext(),
-                        "${game.title} is coming soon.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    return@GamesAdapter
-                }
-
-                val intent =
-                    Intent(
-                        requireContext(),
-                        GameWebViewActivity::class.java
-                    )
-
-                intent.putExtra(
-                    GameWebViewActivity.EXTRA_TITLE,
-                    game.title
-                )
-
-                intent.putExtra(
-                    GameWebViewActivity.EXTRA_URL,
-                    game.webUrl
-                )
-
-                startActivity(intent)
+        val gamesAdapter = GamesAdapter(gamesList) { game ->
+            if (game.webUrl.isBlank()) {
+                Toast.makeText(requireContext(), "${game.title} is coming soon.", Toast.LENGTH_SHORT).show()
+                return@GamesAdapter
             }
 
-        rvGames.layoutManager =
-            LinearLayoutManager(
-                requireContext(),
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
+            val intent = Intent(requireContext(), GameWebViewActivity::class.java).apply {
+                putExtra(GameWebViewActivity.EXTRA_TITLE, game.title)
+                putExtra(GameWebViewActivity.EXTRA_URL, game.webUrl)
+            }
+            startActivity(intent)
+        }
 
-        rvGames.adapter =
-            gamesAdapter
+        rvGames.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        rvGames.adapter = gamesAdapter
     }
 
     private fun setupExercisesRecyclerView() {
-        // Mock data for Exercises (Figma එකේ තියෙන ඒවා)
         val exerciseList = listOf(
             ExerciseItem(
                 "4 - 7 - 8 Breathing Exercise",
                 "A natural tranquilizer for the nervous system to reduce instant anxiety.",
                 "2 Mins | Guided",
-                R.drawable.ic_robot_welcome
-            ),
-            ExerciseItem(
-                "Binaural Beats (Alpha Waves)",
-                "Calm your overactive brain waves and improve focus using acoustic therapy.",
-                "Audio Session | 5 Mins",
                 R.drawable.ic_robot_welcome
             ),
             ExerciseItem(
@@ -166,49 +124,19 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
             )
         )
 
-        val exerciseAdapter =
-            ExercisesAdapter(exerciseList) { exercise ->
-
-                when {
-
-                    exercise.title.contains(
-                        "4 - 7 - 8",
-                        ignoreCase = true
-                    ) -> {
-
-                        startActivity(
-                            Intent(
-                                requireContext(),
-                                BreathingExerciseActivity::class.java
-                            )
-                        )
-                    }
-
-                    exercise.title.contains(
-                        "5-4-3-2-1",
-                        ignoreCase = true
-                    ) -> {
-
-                        startActivity(
-                            Intent(
-
-                                requireContext(),
-                                GroundingExerciseActivity::class.java
-                            )
-                        )
-                    }
-
-                    else -> {
-
-                        Toast.makeText(
-                            requireContext(),
-                            "Audio session will be added in the next step.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+        val exerciseAdapter = ExercisesAdapter(exerciseList) { exercise ->
+            when {
+                exercise.title.contains("4 - 7 - 8", ignoreCase = true) -> {
+                    startActivity(Intent(requireContext(), BreathingExerciseActivity::class.java))
+                }
+                exercise.title.contains("5-4-3-2-1", ignoreCase = true) -> {
+                    startActivity(Intent(requireContext(), GroundingExerciseActivity::class.java))
+                }
+                else -> {
+                    Toast.makeText(requireContext(), "Audio session will be added in the next step.", Toast.LENGTH_SHORT).show()
                 }
             }
-
+        }
         rvExercises.layoutManager = LinearLayoutManager(requireContext())
         rvExercises.adapter = exerciseAdapter
     }

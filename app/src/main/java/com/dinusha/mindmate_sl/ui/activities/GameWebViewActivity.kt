@@ -720,7 +720,7 @@ class GameWebViewActivity : AppCompatActivity() {
             return
         }
 
-        // Other mini-games keep the normal exit behaviour.
+        // Other mini-games keep the normal exit behavior.
         finish()
     }
 

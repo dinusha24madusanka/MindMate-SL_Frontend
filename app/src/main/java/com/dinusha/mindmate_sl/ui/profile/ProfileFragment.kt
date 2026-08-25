@@ -118,7 +118,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             )
             .setPositiveButton("Clear") { _, _ ->
 
-                requireContext()
+                val context = requireContext()
+
+                context
                     .getSharedPreferences(
                         "MindMatePrefs",
                         Context.MODE_PRIVATE
@@ -127,15 +129,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     .clear()
                     .apply()
 
+                context
+                    .getSharedPreferences(
+                        "mindmate_journey",
+                        Context.MODE_PRIVATE
+                    )
+                    .edit()
+                    .clear()
+                    .apply()
+
                 Toast.makeText(
-                    requireContext(),
-                    "Local data cleared.",
+                    context,
+                    "Local MindMate data cleared.",
                     Toast.LENGTH_SHORT
                 ).show()
 
                 loadProfileData()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 }
