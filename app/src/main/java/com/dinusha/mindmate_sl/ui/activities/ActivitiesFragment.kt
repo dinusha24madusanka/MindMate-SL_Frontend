@@ -74,53 +74,70 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
     }
 
     private fun setupGamesRecyclerView() {
+        rvGames.layoutManager =
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
         val gamesList = listOf(
             GameItem(
                 title = "Calm Bubbles",
                 description = "A short focus game for a quick mental break.",
-                durationText = "2 Mins",
+                durationText = "1 Min",
                 imageResId = R.drawable.calm_bubbles_cover,
                 webUrl = "file:///android_asset/games/calm_bubbles.html"
             ),
             GameItem(
                 title = "Mandala Paint Flow",
                 description = "A short mindful coloring activity.",
-                durationText = "3 Mins",
-                imageResId = R.drawable.ic_activities,
+                durationText = "2 Mins",
+                imageResId = R.drawable.mandala_paint_cover,
                 webUrl = "file:///android_asset/games/mandala_paint_flow.html"
             )
         )
-
         val gamesAdapter = GamesAdapter(gamesList) { game ->
-            if (game.webUrl.isBlank()) {
-                Toast.makeText(requireContext(), "${game.title} is coming soon.", Toast.LENGTH_SHORT).show()
-                return@GamesAdapter
+                if (game.webUrl.isBlank()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "${game.title} is coming soon.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@GamesAdapter
+                }
+                val intent = Intent(
+                        requireContext(),
+                        GameWebViewActivity::class.java
+                    ).apply {
+                        putExtra(
+                            GameWebViewActivity.EXTRA_TITLE,
+                            game.title
+                        )
+                        putExtra(
+                            GameWebViewActivity.EXTRA_URL,
+                            game.webUrl
+                        )
+                    }
+                startActivity(intent)
             }
-
-            val intent = Intent(requireContext(), GameWebViewActivity::class.java).apply {
-                putExtra(GameWebViewActivity.EXTRA_TITLE, game.title)
-                putExtra(GameWebViewActivity.EXTRA_URL, game.webUrl)
-            }
-            startActivity(intent)
-        }
-
-        rvGames.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         rvGames.adapter = gamesAdapter
+        rvGames.post {
+            rvGames.scrollToPosition(0)
+        }
     }
-
     private fun setupExercisesRecyclerView() {
         val exerciseList = listOf(
             ExerciseItem(
                 "4 - 7 - 8 Breathing Exercise",
-                "A natural tranquilizer for the nervous system to reduce instant anxiety.",
+                "A guided breathing exercise for a short, structured pause.",
                 "2 Mins | Guided",
-                R.drawable.ic_robot_welcome
+                R.drawable.breathing_cover
             ),
             ExerciseItem(
                 "5-4-3-2-1 Grounding Exercise",
-                "Re-anchor your mind to the present moment during a high-stress situation.",
+                "A sensory grounding exercise to help you focus on the present moment.",
                 "Cognitive | Interactive",
-                R.drawable.ic_robot_welcome
+                R.drawable.grounding_cover
             )
         )
 
@@ -137,7 +154,10 @@ class ActivitiesFragment : Fragment(R.layout.fragment_activities) {
                 }
             }
         }
-        rvExercises.layoutManager = LinearLayoutManager(requireContext())
-        rvExercises.adapter = exerciseAdapter
+        rvExercises.layoutManager =
+            LinearLayoutManager(requireContext())
+
+        rvExercises.adapter =
+            exerciseAdapter
     }
 }

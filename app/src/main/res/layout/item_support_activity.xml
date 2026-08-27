@@ -1,46 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
-    android:layout_height="110dp"
-
+    android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
     android:layout_marginBottom="12dp"
-
-    app:cardBackgroundColor="#454545"
+    android:minHeight="96dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#4A4A4A">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="96dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="12dp">
 
-        <!-- Activity Image -->
         <ImageView
-            android:id="@+id/ivExerciseIcon"
-            android:layout_width="68dp"
-            android:layout_height="68dp"
+            android:id="@+id/imgActivity"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:scaleType="centerCrop"
             android:contentDescription="@null" />
 
-        <!-- Text Content -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/tvExerciseTitle"
+                android:id="@+id/tvActivityTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
@@ -50,25 +46,16 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvExerciseDesc"
+                android:id="@+id/tvActivityDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="4dp"
+                android:minLines="2"
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:lineSpacingExtra="1dp"
-                android:textColor="#E0E0E0"
+                android:textColor="#D7E5E3"
                 android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tvExerciseDuration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textColor="#68CFC4"
-                android:textSize="11sp" />
 
         </LinearLayout>
 

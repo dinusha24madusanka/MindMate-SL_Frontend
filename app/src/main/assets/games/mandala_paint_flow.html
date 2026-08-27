@@ -1205,6 +1205,67 @@
       return { done, total: cells.length, percent };
     }
 
+    function resolveHomeLevel() {
+    currentLevel = resolveHomeLevel();
+    state.currentLevel = currentLevel;
+    const savedProgress = getLevelProgress(savedLevel);
+    /*
+     * If the saved level has partial progress,
+     * keep it active.
+     * This also supports an in-progress replay.
+     */
+    if (
+        savedProgress.done > 0 &&
+        savedProgress.percent < 100
+    ) {
+        return savedLevel;
+    }
+
+    /*
+     * Prefer an unlocked unfinished level
+     * that already has partial progress.
+     */
+    for (
+        let level = state.unlockedLevel;
+        level >= 1;
+        level--
+    ) {
+
+        const progress =
+            getLevelProgress(level);
+
+        if (
+            !state.levels[level].completed &&
+            progress.done > 0 &&
+            progress.percent < 100
+        ) {
+            return level;
+        }
+    }
+
+    /*
+     * Otherwise choose the first unlocked
+     * unfinished level.
+     */
+    for (
+        let level = 1;
+        level <= state.unlockedLevel;
+        level++
+    ) {
+
+        if (
+            !state.levels[level].completed
+        ) {
+            return level;
+        }
+    }
+
+    /*
+     * All unlocked levels completed.
+     */
+    return savedLevel;
+}
+
     function renderHome(){
 
     currentLevel = Math.min(

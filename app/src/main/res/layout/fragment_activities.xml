@@ -85,14 +85,14 @@
                 android:textSize="12sp" />
         </RelativeLayout>
 
-        <!-- Horizontal RecyclerView for Games -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvGames"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginBottom="24dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
 
         <!-- Breathing & Audio Section -->
         <RelativeLayout
@@ -103,7 +103,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Breathing &amp; Audio"
+                android:text="Breathing &amp; Grounding"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -117,13 +117,15 @@
                 android:textSize="12sp" />
         </RelativeLayout>
 
-        <!-- Vertical RecyclerView for Exercises -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvExercises"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:overScrollMode="never"
+            android:paddingEnd="4dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
