@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import okhttp3.OkHttpClient;
 import java.util.concurrent.TimeUnit;
 public class RetrofitClient {
-    private static final String BASE_URL = " https://president-depend-usually-matthew.trycloudflare.com/";
+    private static final String BASE_URL = "https://resident-tahoe-hoping-passengers.trycloudflare.com/";
     private static Retrofit retrofit;
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
