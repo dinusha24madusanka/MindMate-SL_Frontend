@@ -5,6 +5,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+
 android {
     namespace = "com.dinusha.mindmate_sl"
     compileSdk = 37
@@ -56,6 +57,8 @@ dependencies {
     implementation("com.tbuonomo:dotsindicator:5.1.1")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-    implementation("com.google.firebase:firebase-auth:24.2.0")
-    implementation("com.google.firebase:firebase-firestore:26.6.0")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-database")
 }
+

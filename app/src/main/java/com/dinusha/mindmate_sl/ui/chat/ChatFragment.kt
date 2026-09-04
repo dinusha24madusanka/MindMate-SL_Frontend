@@ -32,7 +32,9 @@ import kotlin.math.roundToInt
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import com.dinusha.mindmate_sl.data.firebase.FirebaseRepository
+import com.dinusha.mindmate_sl.data.model.firebase.FirebaseRepository
+import com.dinusha.mindmate_sl.data.model.firebase.FirebaseSyncRepository
+
 
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
@@ -60,6 +62,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private lateinit var btnSuggestedGrounding: MaterialButton
     private lateinit var btnKeepChatting: MaterialButton
     private lateinit var tvGameSuggestion: TextView
+    private lateinit var firebaseSync: FirebaseSyncRepository
 
     private var suggestedGameType = "CALM_BUBBLES"
     private var suggestedMandalaLevel = 1
@@ -90,6 +93,17 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         btnSuggestedGrounding = view.findViewById(R.id.btnSuggestedGrounding)
         btnKeepChatting =view.findViewById(R.id.btnKeepChatting)
         cardSupportActivity.visibility = View.GONE
+        firebaseSync = FirebaseSyncRepository(requireContext())
+
+        firebaseSync.ensureAuthenticated(
+            onSuccess = {
+                restoreFirebaseData()
+            },
+            onFailure = { e ->
+                Log.e("ChatFragment", "Firebase authentication failed", e)
+                // Continue with local data only
+            }
+        )
 
         // 2. Configuring the top header based on the selected robot
         setupTopHeader()
@@ -326,10 +340,13 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             )
         }
 
-        // Default ආරම්භක තත්ත්වය (පරණ ස්කෝර් එකක් නැත්නම් මැද අගය 50 ගනී)
+        // Default ආරම්භක තත්ත්වය (Cached state restoration)
         val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
         val lastSavedScore = sharedPreferences.getInt("LAST_STRESS_SCORE", 50)
-        updateAvatarAndMood(lastSavedScore)
+        val lastEmotion = sharedPreferences.getString("LAST_EMOTION", null)
+        val lastStressLevel = sharedPreferences.getString("LAST_STRESS_LEVEL", null)
+        
+        updateAvatarFromAnalysis(lastEmotion, lastSavedScore, lastStressLevel)
     }
 
     private val gameLauncher =
@@ -442,11 +459,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
             }
         }
-
-
-    /**
-     * තෝරාගත් රොබෝවරයා අනුව ඉහළ Header එකේ නම සහ Icon එක ගතිකව වෙනස් කිරීම
-     */
     private fun setupTopHeader() {
         val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
         val selectedAvatarId = sharedPreferences.getString("SELECTED_AVATAR_ID", "bot_gizmo") ?: "bot_gizmo"
@@ -468,40 +480,68 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     }
 
     /**
-     * රොබෝවාගේ Animation සහ මැද කොටුවේ Background වර්ණය යාවත්කාලීන කිරීම
+     * Main source of truth for the robot avatar state.
+     * Maps analysis results to Lottie animations and background colors.
      */
-    fun updateAvatarAndMood(stressLevel: Int) {
+    private fun updateAvatarFromAnalysis(
+        emotion: String?,
+        stressScore: Int,
+        stressLevel: String?,
+        riskLevel: String? = "NONE"
+    ) {
         val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
         val selectedAvatarId = sharedPreferences.getString("SELECTED_AVATAR_ID", "bot_gizmo") ?: "bot_gizmo"
 
-        val (mood, backgroundColorHex) = when (stressLevel) {
+        var mood = "neutral"
+        var backgroundColor = "#FFF9C4" // Default Yellow
 
-            // Backend LOW
-            in 0..49 ->
-                Pair(
-                    "happy",
-                    "#E0F2F1"
-                )
+        val normalizedEmotion = emotion?.trim()?.uppercase() ?: "UNCERTAIN"
+        val normalizedRisk = riskLevel?.trim()?.uppercase() ?: "NONE"
+        val normalizedStressLevel = stressLevel?.trim()?.uppercase() ?: "UNKNOWN"
 
-            // Backend MODERATE
-            in 50..74 ->
-                Pair(
-                    "neutral",
-                    "#FFF9C4"
-                )
+        Log.d("AvatarMood", "Decision Input: risk=$normalizedRisk emotion=$normalizedEmotion stress=$stressScore stressLevel=$normalizedStressLevel")
 
-            // Backend HIGH
-            in 75..100 ->
-                Pair(
-                    "sad",
-                    "#FFCDD2"
-                )
+        // 1. Safety Priority (HIGH Risk always maps to SAD/SUPPORTIVE)
+        if (normalizedRisk == "HIGH") {
+            mood = "sad"
+            backgroundColor = "#FFCDD2" // Soft Red/Pink
+            Log.d("AvatarMood", "HIGH RISK -> forced SAD safety state")
+        } else {
+            // 2. Emotion Mapping (Priority over Stress Score)
+            val effectiveMood = when (normalizedEmotion) {
+                "JOY", "LOVE", "HAPPY", "POSITIVE" -> "happy"
+                "SADNESS", "SAD", "FEAR", "ANGER" -> "sad"
+                "SURPRISE" -> "neutral"
+                else -> null // Fallback to stress score for UNCERTAIN/Null
+            }
 
-            else ->
-                Pair(
-                    "neutral",
-                    "#F5F5F5"
-                )
+            if (effectiveMood != null) {
+                mood = effectiveMood
+            } else {
+                // 3. Stress Score Fallback
+                mood = when (stressScore) {
+                    in 0..49 -> "happy"
+                    in 50..74 -> "neutral"
+                    in 75..100 -> "sad"
+                    else -> {
+                        // Secondary fallback to stressLevel string
+                        when (normalizedStressLevel) {
+                            "LOW" -> "happy"
+                            "MODERATE" -> "neutral"
+                            "HIGH" -> "sad"
+                            else -> "neutral"
+                        }
+                    }
+                }
+            }
+
+            // 4. Background Color Mapping based on resulting Mood
+            backgroundColor = when (mood) {
+                "happy" -> "#E0F2F1" // Soft Calming Green
+                "neutral" -> "#FFF9C4" // Soft Warm Yellow
+                "sad" -> "#FFCDD2"   // Soft Supportive Red/Pink
+                else -> "#F5F5F5"
+            }
         }
 
         val avatarPrefix = when (selectedAvatarId) {
@@ -511,32 +551,26 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         }
 
         val animationFileName = "${avatarPrefix}_${mood}.json"
+        Log.d("AvatarMood", "Result: selectedAvatar=$selectedAvatarId mood=$mood animation=$animationFileName background=$backgroundColor")
 
         try {
-            avatarBackgroundContainer.setBackgroundColor(Color.parseColor(backgroundColorHex))
+            lottieRobotAvatar.cancelAnimation()
             lottieRobotAvatar.setAnimation(animationFileName)
+            lottieRobotAvatar.progress = 0f
             lottieRobotAvatar.playAnimation()
+            avatarBackgroundContainer.setBackgroundColor(Color.parseColor(backgroundColor))
         } catch (e: Exception) {
-            Log.e("ChatFragment", "Animation Error: $animationFileName", e)
+            Log.e("AvatarMood", "Animation Error: $animationFileName", e)
         }
     }
 
-    /**
-     * රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම සහ අගය සේව් කිරීම
-     */
-    fun receiveBotResponse(reply: String, stressScore: Int) {
-        // 1. ලැබුණු Stress Score එක SharedPreferences එකට සේව් කිරීම (ActivitiesFragment එකට කියවීමට)
-        val sharedPreferences = requireContext().getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putInt("LAST_STRESS_SCORE", stressScore).apply()
-
-        // 2. රොබෝගේ පෙනුම වෙනස් කිරීම
-        updateAvatarAndMood(stressScore)
-
-        // 3. Stress Score එක අනුව ක්‍රියාකාරකම් යෝජනා කිරීම
-        handleActivitySuggestion(stressScore)
-
-        // 4. රොබෝවරයාගේ පිළිතුර ලැයිස්තුවට එකතු කර තිරය Update කිරීම
-        addBotMessage(reply)
+    private fun updateAvatarToSafetyState() {
+        updateAvatarFromAnalysis(
+            emotion = null,
+            stressScore = 0,
+            stressLevel = "NOT_EVALUATED",
+            riskLevel = "HIGH"
+        )
     }
 
     private fun handleHybridResponse(
@@ -553,6 +587,19 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
         val recommendedActivity =
             response.recommendedActivity ?: "NONE"
+
+        // FIREBASE NLP RESULT
+        firebaseSync.saveNlpResult(
+            intent = response.intent,
+            intentConfidence = response.intentConfidence,
+            emotion = response.emotion,
+            emotionConfidence = response.emotionConfidence,
+            stressScore = response.stressScore.toDouble(),
+            stressLevel = response.stressLevel,
+            riskLevel = riskLevel,
+            recommendedActivity = recommendedActivity,
+            allowGamification = allowGamification
+        )
 
 
         // =========================================
@@ -578,6 +625,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             cardFeelingCheck.visibility =
                 View.GONE
 
+
+            // Force SAD avatar and safety background for HIGH risk
+            updateAvatarToSafetyState()
 
             // IMPORTANT:
             // Backend stress_score = 0 here because
@@ -644,9 +694,12 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             .apply()
 
 
-        // Robot mood
-        updateAvatarAndMood(
-            stressScore
+        // Avatar updated using current analysis (Emotion + Stress + Safety)
+        updateAvatarFromAnalysis(
+            emotion = response.emotion,
+            stressScore = stressScore,
+            stressLevel = response.stressLevel,
+            riskLevel = riskLevel
         )
 
 
@@ -677,41 +730,23 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         when (
             recommendedActivity.uppercase()
         ) {
-
-            // =====================================
             // CALM BUBBLES
-            // =====================================
-
             "CALM_BUBBLES" -> {
 
-                suggestedGameType =
-                    "CALM_BUBBLES"
-
-                tvGameSuggestion.text =
-                    "Would you like a short 60-second supportive break with Calm Bubbles?"
-
-                btnPlaySuggestedGame.text =
-                    "🫧 Calm Bubbles"
-
-                cardGameSuggestion.visibility =
-                    View.VISIBLE
+                suggestedGameType = "CALM_BUBBLES"
+                tvGameSuggestion.text = "Would you like a short 60-second supportive break with Calm Bubbles?"
+                btnPlaySuggestedGame.text = "🫧 Calm Bubbles"
+                cardGameSuggestion.visibility = View.VISIBLE
             }
 
-
-            // =====================================
             // MANDALA
-            // =====================================
-
             "MANDALA" -> {
-
                 val prefs =
                     requireContext()
                         .getSharedPreferences(
                             "MindMatePrefs",
                             Context.MODE_PRIVATE
                         )
-
-
                 val status =
                     prefs.getString(
                         "MANDALA_LAST_STATUS",
@@ -990,16 +1025,11 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         /*
          * Default suggestion
          */
-        suggestedGameType =
-            "CALM_BUBBLES"
+        suggestedGameType = "CALM_BUBBLES"
+        tvGameSuggestion.text = "Would you like a short 60-second break with Calm Bubbles?"
 
 
-        tvGameSuggestion.text =
-            "Would you like a short 60-second break with Calm Bubbles?"
-
-
-        btnPlaySuggestedGame.text =
-            "🫧 Calm Bubbles"
+        btnPlaySuggestedGame.text = "🫧 Calm Bubbles"
 
 
         cardGameSuggestion.visibility =
@@ -1080,6 +1110,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         feedback: String
     ) {
 
+        // Local SharedPreferences
         requireContext()
             .getSharedPreferences(
                 "MindMatePrefs",
@@ -1091,28 +1122,24 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 feedback
             )
             .apply()
+
+        // Firebase Realtime Database
+        firebaseSync.saveMoodRecord(feedback)
     }
 
     private fun saveStressScoreToJourney(
         stressScore: Int
     ) {
 
-        // ---------------------------------------------------------
         // Validate backend score
-        // ---------------------------------------------------------
-
         if (stressScore !in 0..100) {
             return
         }
-
-
         val preferences =
             requireContext().getSharedPreferences(
                 "mindmate_journey",
-                android.content.Context.MODE_PRIVATE
+                Context.MODE_PRIVATE
             )
-
-
         val dateKey =
             java.text.SimpleDateFormat(
                 "yyyy-MM-dd",
@@ -1121,17 +1148,12 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 java.util.Date()
             )
 
-
-        // ---------------------------------------------------------
         // Existing AI scores for today
-        // ---------------------------------------------------------
-
         val currentSum =
             preferences.getInt(
                 "${dateKey}_ai_stress_sum",
                 0
             )
-
 
         val currentCount =
             preferences.getInt(
@@ -1192,6 +1214,57 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             )
 
             .apply()
+
+        // Firebase Journey Sync
+        firebaseSync.saveJourneyDay(
+            date = dateKey,
+            stressSum = newSum,
+            observationCount = newCount,
+            dailyAverage = averageStress
+        )
+    }
+
+    private fun restoreFirebaseData() {
+
+        // -----------------------------
+        // Restore MindPoints
+        // -----------------------------
+
+        firebaseSync.loadMindPoints(
+            onSuccess = { points ->
+
+                if (!isAdded) {
+                    return@loadMindPoints
+                }
+
+                Log.d(
+                    "ChatFragment",
+                    "MindPoints restored: $points"
+                )
+
+                // SharedPreferences already updated
+                // by FirebaseSyncRepository.
+            }
+        )
+
+
+        // -----------------------------
+        // Restore Journey
+        // -----------------------------
+
+        firebaseSync.loadJourney(
+            onComplete = {
+
+                if (!isAdded) {
+                    return@loadJourney
+                }
+
+                Log.d(
+                    "ChatFragment",
+                    "Journey restore complete"
+                )
+            }
+        )
     }
 
 

@@ -12,12 +12,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.dinusha.mindmate_sl.R
 import com.dinusha.mindmate_sl.ui.avatar.ChooseRobotActivity
+import com.dinusha.mindmate_sl.data.model.firebase.FirebaseSyncRepository
+import android.util.Log
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var ivProfileAvatar: ImageView
     private lateinit var tvAvatarName: TextView
     private lateinit var tvMindPoints: TextView
+    private lateinit var firebaseSync: FirebaseSyncRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -25,6 +28,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         ivProfileAvatar = view.findViewById(R.id.ivProfileAvatar)
         tvAvatarName = view.findViewById(R.id.tvAvatarName)
         tvMindPoints = view.findViewById(R.id.tvMindPoints)
+
+        firebaseSync = FirebaseSyncRepository(requireContext())
+        syncMindPointsFromFirebase()
 
         val btnChangeCompanion =
             view.findViewById<Button>(R.id.btnChangeCompanion)
@@ -107,6 +113,23 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         tvMindPoints.text =
             "$points pts"
+    }
+
+    private fun syncMindPointsFromFirebase() {
+
+        firebaseSync.loadMindPoints(
+            onSuccess = { points ->
+
+                if (!isAdded) return@loadMindPoints
+
+                Log.d("ProfileFragment", "MindPoints synced: $points")
+
+                tvMindPoints.text = "$points pts"
+            },
+            onFailure = { e ->
+                Log.e("ProfileFragment", "MindPoints sync failed", e)
+            }
+        )
     }
 
     private fun showClearDataDialog() {

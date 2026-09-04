@@ -1,4 +1,4 @@
-package com.dinusha.mindmate_sl.data.firebase
+package com.dinusha.mindmate_sl.data.model.firebase
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth

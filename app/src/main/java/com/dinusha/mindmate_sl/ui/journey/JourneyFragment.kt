@@ -16,6 +16,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.dinusha.mindmate_sl.data.model.firebase.FirebaseSyncRepository
+import android.util.Log
 
 class JourneyFragment : Fragment() {
 
@@ -36,6 +38,7 @@ class JourneyFragment : Fragment() {
     private lateinit var stressTrendText: TextView
     private lateinit var dataCoverageText: TextView
     private lateinit var aiInsightText: TextView
+    private lateinit var firebaseSync: FirebaseSyncRepository
 
     private var selectedMood: String? = null
     private var selectedEmoji: String? = null
@@ -111,6 +114,9 @@ class JourneyFragment : Fragment() {
 
         aiInsightText =
             view.findViewById(R.id.aiInsightText)
+
+        firebaseSync = FirebaseSyncRepository(requireContext())
+        syncJourneyFromFirebase()
 
         setupMoodButtons()
 
@@ -257,6 +263,22 @@ class JourneyFragment : Fragment() {
         loadMoodHistory()
 
         generateInsight()
+    }
+
+    private fun syncJourneyFromFirebase() {
+
+        firebaseSync.loadJourney(
+            onComplete = {
+                if (!isAdded) return@loadJourney
+
+                Log.d("JourneyFragment", "Journey synced from Firebase")
+
+                refreshJourney()
+            },
+            onFailure = { e ->
+                Log.e("JourneyFragment", "Journey sync failed", e)
+            }
+        )
     }
 
     private fun loadWeeklyStressData() {

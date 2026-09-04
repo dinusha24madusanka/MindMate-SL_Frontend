@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.dinusha.mindmate_sl.R
 import android.content.Context
 import android.content.Intent
+import com.dinusha.mindmate_sl.data.model.firebase.FirebaseSyncRepository
 
 class BreathingExerciseActivity : AppCompatActivity() {
 
@@ -17,6 +18,7 @@ class BreathingExerciseActivity : AppCompatActivity() {
     private lateinit var tvRound: TextView
     private lateinit var btnStart: Button
     private lateinit var breathingCircle: android.view.View
+    private lateinit var firebaseSync: FirebaseSyncRepository
 
     private var currentTimer: CountDownTimer? = null
     private var running = false
@@ -42,6 +44,8 @@ class BreathingExerciseActivity : AppCompatActivity() {
                 stopExercise()
             }
         }
+
+        firebaseSync = FirebaseSyncRepository(this)
     }
 
     private fun startExercise() {
@@ -150,68 +154,52 @@ class BreathingExerciseActivity : AppCompatActivity() {
     }
 
     private fun finishExercise() {
-
         running = false
-
         currentTimer?.cancel()
-
         tvPhase.text = "Completed"
         tvTimer.text = "✓"
-
         btnStart.text = "Completed"
         btnStart.isEnabled = false
 
         // Add MindPoints
         addMindPoints(15)
-
         // Return result to ChatFragment
         val resultIntent = Intent().apply {
-
             putExtra(
                 RESULT_ACTIVITY_TYPE,
                 "BREATHING"
             )
-
             putExtra(
                 RESULT_POINTS,
                 15
             )
         }
-
         setResult(
             RESULT_OK,
             resultIntent
         )
-
         Toast.makeText(
             this,
             "Breathing session completed. +15 MindPoints",
             Toast.LENGTH_SHORT
         ).show()
-
         finish()
     }
 
     private fun addMindPoints(points: Int) {
 
-        val prefs =
-            getSharedPreferences(
-                "MindMatePrefs",
-                Context.MODE_PRIVATE
-            )
+        val prefs = getSharedPreferences("MindMatePrefs", Context.MODE_PRIVATE)
 
-        val currentPoints =
-            prefs.getInt(
-                "MIND_POINTS",
-                0
-            )
+        val currentPoints = prefs.getInt("MIND_POINTS", 0)
+        val newPoints = currentPoints + points
 
+        // Local cache
         prefs.edit()
-            .putInt(
-                "MIND_POINTS",
-                currentPoints + points
-            )
+            .putInt("MIND_POINTS", newPoints)
             .apply()
+
+        // Firebase sync
+        firebaseSync.saveMindPoints(newPoints)
     }
 
     private fun stopExercise() {

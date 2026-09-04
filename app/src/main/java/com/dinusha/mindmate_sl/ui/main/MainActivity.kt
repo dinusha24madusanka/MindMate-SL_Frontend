@@ -11,6 +11,7 @@ import com.dinusha.mindmate_sl.ui.journey.JourneyFragment
 import com.dinusha.mindmate_sl.ui.profile.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigation: BottomNavigationView
@@ -65,10 +66,20 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             bottomNavigation.selectedItemId = R.id.nav_chat
         }
+
+        // Test Firebase Realtime Database connection
+        val database = FirebaseDatabase.getInstance()
+        val ref = database.getReference("connection_test")
+        ref.setValue("MindMate-SL connected")
+            .addOnSuccessListener {
+                println("FIREBASE SUCCESS")
+            }
+            .addOnFailureListener { e ->
+                println("FIREBASE ERROR: ${e.message}")
+            }
     }
 
     // FIREBASE ANONYMOUS AUTH
-
     private fun initializeFirebaseUser() {
         val currentUser =firebaseAuth.currentUser
         // Existing anonymous user
